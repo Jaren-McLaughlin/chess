@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -66,6 +67,16 @@ public class ChessPiece {
         return type;
     }
 
+    Map<PieceType, int[][]> pieceMoves = Map.of(
+        // Sliding pieces
+        PieceType.ROOK, new int[][] {{1,0},{0,1},{-1,0},{0,-1}},
+        PieceType.BISHOP, new int[][] {{1,1},{-1,1},{1,-1},{-1,-1}},
+        PieceType.QUEEN, new int[][] {{1,0},{0,1},{-1,0},{0,-1},{1,1},{-1,1},{1,-1},{-1,-1}},
+        // Static moves
+        PieceType.KNIGHT, new int[][] {{2,1},{1,2},{-2,1},{-1,2},{2,-1},{1,-2},{-2,-1},{-1,-2}},
+        PieceType.KING, new int[][] {{1,0},{0,1},{-1,0},{0,-1},{1,1},{-1,1},{1,-1},{-1,-1}}
+    );
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -75,6 +86,36 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
+        if (
+            this.type == PieceType.ROOK ||
+            this.type == PieceType.BISHOP ||
+            this.type == PieceType.QUEEN
+        ) {
+            int[][] directions = pieceMoves.get(this.type);
+
+            for (int[] direction : directions) {
+                int newRow = myPosition.getRow();
+                int newCol = myPosition.getColumn();
+                while(true) {
+                    newRow = newRow + direction[0];
+                    newCol = newCol + direction[1];
+                    ChessPosition newMove;
+                    try {
+                        newMove = new ChessPosition(newRow, newCol);
+                    } catch (Exception e) {
+                        break;
+                    }
+                    ChessPiece isPiece = board.getPiece(newMove);
+                    if (isPiece != null) {
+                        if (this.pieceColor != isPiece.pieceColor) {
+                            moves.add(new ChessMove(myPosition, newMove, null));
+                        }
+                        break;
+                    }
+                    moves.add(new ChessMove(myPosition, newMove, null));
+                }
+            }
+        }
         return moves;
     }
 }
