@@ -53,10 +53,11 @@ public class ChessBoard {
                 ChessPiece.PieceType.KNIGHT,
                 ChessPiece.PieceType.ROOK
         };
+        //Reset board
+        gameBoard = new ChessPiece[8][8];
 
         for (int i = 0; i < 8; i++) {
-            gameBoard = new ChessPiece[8][8];
-
+            System.out.println(new ChessPiece(ChessGame.TeamColor.WHITE, pieces[i]));
             gameBoard[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, pieces[i]);
             gameBoard[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
             gameBoard[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
@@ -67,7 +68,7 @@ public class ChessBoard {
     @Override
     public String toString() {
         return "ChessBoard{" +
-                "gameBoard=" + Arrays.toString(gameBoard) +
+                "gameBoard=" + Arrays.deepToString(gameBoard) +
                 '}';
     }
 
