@@ -116,6 +116,31 @@ public class ChessPiece {
                 }
             }
         }
+        if (
+            this.type == PieceType.KNIGHT ||
+            this.type == PieceType.KING
+        ) {
+            int[][] directions = pieceMoves.get(this.type);
+
+            for (int[] direction : directions) {
+                int newRow = myPosition.getRow() + direction[0];
+                int newCol = myPosition.getColumn() + direction[1];
+                ChessPosition newMove;
+                try {
+                    newMove = new ChessPosition(newRow, newCol);
+                } catch (Exception e) {
+                    continue;
+                }
+                ChessPiece isPiece = board.getPiece(newMove);
+                if (isPiece != null) {
+                    if (this.pieceColor != isPiece.pieceColor) {
+                        moves.add(new ChessMove(myPosition, newMove, null));
+                    }
+                    continue;
+                }
+                moves.add(new ChessMove(myPosition, newMove, null));
+            }
+        }
         return moves;
     }
 }
