@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Represents a single chess piece
@@ -86,6 +83,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
+        // Sliding logic
         if (
             this.type == PieceType.ROOK ||
             this.type == PieceType.BISHOP ||
@@ -116,6 +114,7 @@ public class ChessPiece {
                 }
             }
         }
+        // Static logic
         if (
             this.type == PieceType.KNIGHT ||
             this.type == PieceType.KING
@@ -139,6 +138,64 @@ public class ChessPiece {
                     continue;
                 }
                 moves.add(new ChessMove(myPosition, newMove, null));
+            }
+        }
+        // Pawn Logic
+        if (this.type == PieceType.PAWN) {
+            int pawnDirection = 1;
+            if (this.pieceColor == ChessGame.TeamColor.BLACK) {
+                pawnDirection = -1;
+            }
+
+            List<ChessPosition> pawnMoves = new ArrayList<>();
+
+            int newRow = myPosition.getRow() + pawnDirection;
+            ChessPosition newPosition = new ChessPosition(newRow, myPosition.getColumn());
+            ChessPiece isPiece = board.getPiece(newPosition);
+            if (isPiece == null) {
+                pawnMoves.add(newPosition);
+                // Check if it's a start piece
+                if (
+                    (myPosition.getRow() == 2 && this.pieceColor == ChessGame.TeamColor.WHITE) ||
+                    (myPosition.getRow() == 7 && this.pieceColor == ChessGame.TeamColor.BLACK)
+                ) {
+                    int twoForward = myPosition.getRow() + (2 * pawnDirection);
+                    ChessPosition newPositionTwo = new ChessPosition(twoForward, myPosition.getColumn());
+                    ChessPiece isPieceTwo = board.getPiece(newPositionTwo);
+                    if (isPieceTwo == null) {
+                        moves.add(new ChessMove(myPosition, newPositionTwo, null));
+                    }
+                }
+            }
+
+            try {
+                ChessPosition attack1 = new ChessPosition(newRow, myPosition.getColumn() - 1);
+                ChessPiece canAttack = board.getPiece(attack1);
+                if (canAttack != null && this.pieceColor != canAttack.pieceColor) {
+                    pawnMoves.add(attack1);
+                }
+            } catch (Exception e) {
+                System.out.println("meh");
+            }
+            try {
+                ChessPosition attack2 = new ChessPosition(newRow, myPosition.getColumn() + 1);
+                ChessPiece canAttack = board.getPiece(attack2);
+                if (canAttack != null && this.pieceColor != canAttack.pieceColor) {
+                    pawnMoves.add(attack2);
+                }
+            } catch (Exception e) {
+                System.out.println("meh");
+            }
+
+            for (ChessPosition pawnMove : pawnMoves) {
+                if (newRow == 1 || newRow == 8) {
+                    moves.add(new ChessMove(myPosition, pawnMove, PieceType.BISHOP));
+                    moves.add(new ChessMove(myPosition, pawnMove, PieceType.KNIGHT));
+                    moves.add(new ChessMove(myPosition, pawnMove, PieceType.ROOK));
+                    moves.add(new ChessMove(myPosition, pawnMove, PieceType.QUEEN));
+                    continue;
+                }
+                moves.add(new ChessMove(myPosition, pawnMove, null));
             }
         }
         return moves;
