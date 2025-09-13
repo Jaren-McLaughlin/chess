@@ -64,7 +64,7 @@ public class ChessPiece {
         return type;
     }
 
-    Map<PieceType, int[][]> pieceMoves = Map.of(
+    Map<PieceType, int[][]> chessPieceMoves = Map.of(
         // Sliding pieces
         PieceType.ROOK, new int[][] {{1,0},{0,1},{-1,0},{0,-1}},
         PieceType.BISHOP, new int[][] {{1,1},{-1,1},{1,-1},{-1,-1}},
@@ -89,7 +89,7 @@ public class ChessPiece {
             this.type == PieceType.BISHOP ||
             this.type == PieceType.QUEEN
         ) {
-            int[][] directions = pieceMoves.get(this.type);
+            int[][] directions = chessPieceMoves.get(this.type);
 
             for (int[] direction : directions) {
                 int newRow = myPosition.getRow();
@@ -119,7 +119,7 @@ public class ChessPiece {
             this.type == PieceType.KNIGHT ||
             this.type == PieceType.KING
         ) {
-            int[][] directions = pieceMoves.get(this.type);
+            int[][] directions = chessPieceMoves.get(this.type);
 
             for (int[] direction : directions) {
                 int newRow = myPosition.getRow() + direction[0];

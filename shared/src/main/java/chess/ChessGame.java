@@ -10,9 +10,10 @@ import java.util.Collection;
  */
 public class ChessGame {
     TeamColor teamTurn;
+    ChessBoard chessBoard;
 
     public ChessGame() {
-        new ChessBoard();
+        this.chessBoard = new ChessBoard();
         this.teamTurn = TeamColor.WHITE;
     }
 
@@ -48,7 +49,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+//        startPosition.
+//        Collection<ChessMove> moves =
     }
 
     /**
