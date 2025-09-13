@@ -74,6 +74,24 @@ public class ChessPiece {
         PieceType.KING, new int[][] {{1,0},{0,1},{-1,0},{0,-1},{1,1},{-1,1},{1,-1},{-1,-1}}
     );
 
+    private record moveSet(ChessPosition move, boolean isAttack) {};
+    private moveSet getMove(int newRow, int newCol, ChessBoard board) {
+        ChessPosition newMove;
+        try {
+            newMove = new ChessPosition(newRow, newCol);
+        } catch (Exception e) {
+            return new moveSet(null, false);
+        }
+        ChessPiece isPiece = board.getPiece(newMove);
+        if (isPiece != null) {
+            if (this.pieceColor != isPiece.pieceColor) {
+                return new moveSet(newMove, true);
+            }
+            return new moveSet(null, false);
+        }
+        return new moveSet(newMove, false);
+    };
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -81,7 +99,10 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> pieceMoves(
+            ChessBoard board,
+            ChessPosition myPosition
+    ) {
         Collection<ChessMove> moves = new ArrayList<>();
         // Sliding logic
         if (
@@ -97,20 +118,15 @@ public class ChessPiece {
                 while(true) {
                     newRow = newRow + direction[0];
                     newCol = newCol + direction[1];
-                    ChessPosition newMove;
-                    try {
-                        newMove = new ChessPosition(newRow, newCol);
-                    } catch (Exception e) {
+                    moveSet movement = getMove(newRow, newCol, board);
+                    if (movement.move == null) {
                         break;
                     }
-                    ChessPiece isPiece = board.getPiece(newMove);
-                    if (isPiece != null) {
-                        if (this.pieceColor != isPiece.pieceColor) {
-                            moves.add(new ChessMove(myPosition, newMove, null));
-                        }
+                    if (movement.isAttack) {
+                        moves.add(new ChessMove(myPosition, movement.move, null));
                         break;
                     }
-                    moves.add(new ChessMove(myPosition, newMove, null));
+                    moves.add(new ChessMove(myPosition, movement.move, null));
                 }
             }
         }
@@ -124,20 +140,16 @@ public class ChessPiece {
             for (int[] direction : directions) {
                 int newRow = myPosition.getRow() + direction[0];
                 int newCol = myPosition.getColumn() + direction[1];
-                ChessPosition newMove;
-                try {
-                    newMove = new ChessPosition(newRow, newCol);
-                } catch (Exception e) {
+
+                moveSet movement = getMove(newRow, newCol, board);
+                if (movement.move == null) {
                     continue;
                 }
-                ChessPiece isPiece = board.getPiece(newMove);
-                if (isPiece != null) {
-                    if (this.pieceColor != isPiece.pieceColor) {
-                        moves.add(new ChessMove(myPosition, newMove, null));
-                    }
+                if (movement.isAttack) {
+                    moves.add(new ChessMove(myPosition, movement.move, null));
                     continue;
                 }
-                moves.add(new ChessMove(myPosition, newMove, null));
+                moves.add(new ChessMove(myPosition, movement.move, null));
             }
         }
         // Pawn Logic
