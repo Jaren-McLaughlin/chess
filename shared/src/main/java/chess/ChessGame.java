@@ -82,6 +82,9 @@ public class ChessGame {
             }
             ChessPosition locationPosition = new ChessPosition(i,j);
             ChessPiece locationPiece = board.getPiece(locationPosition);
+            if (locationPiece == null) {
+                continue;
+            }
             ChessGame.TeamColor locationColor = locationPiece.getTeamColor();
             if (locationColor != teamColor) {
                 continue;
@@ -93,12 +96,12 @@ public class ChessGame {
     }
 
     private boolean attacksKing(ChessMove potentialMove) {
+        TeamColor myTeam = getMovingColor(potentialMove);
         // create a temp board with the piece in the new location
         ChessBoard tempBoard = chessBoard;
         tempBoard.movePiece(potentialMove);
 
         // Get opponent color
-        TeamColor myTeam = getMovingColor(potentialMove);
         TeamColor opponent = myTeam == TeamColor.WHITE ? TeamColor.WHITE : TeamColor.BLACK;
         // Check all enemy moves
         Collection<ChessMove> moves = getTeamMoves(opponent, tempBoard);
@@ -160,13 +163,22 @@ public class ChessGame {
         Collection<ChessMove> possibleMoves = validMoves(startLocation);
 
         // if it's not a valid move, throw error
-        // Move piece to array spot
-
-        // Take this move and find all it's move
+        if (!possibleMoves.contains(move)) {
+            throw new InvalidMoveException("Not a legal move");
+        }
+        // Move piece to spot
+        chessBoard.movePiece(move);
         // Check if one of the moves is the opponents king
-        // if it is, set flag to true
-        if (isKing != null) {
-            isInCheck.put(pieceColor, true);
+        Collection<ChessMove> newMoves = movingPiece.pieceMoves(chessBoard, move.getEndPosition());
+        // Find their king
+        TeamColor opponent = pieceColor == TeamColor.WHITE ? TeamColor.WHITE : TeamColor.BLACK;
+        ChessPosition theirKing = chessBoard.getLocationByPiece(new ChessPiece(opponent, ChessPiece.PieceType.KING));
+
+        // if it is in check now, set flag to true
+        for (ChessMove newMove: newMoves) {
+            if (newMove.getEndPosition().equals(theirKing)) {
+                isInCheck.put(opponent, true);
+            }
         }
     }
 
