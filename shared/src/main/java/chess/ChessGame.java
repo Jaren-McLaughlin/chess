@@ -68,6 +68,9 @@ public class ChessGame {
 
     private boolean attacksKing(ChessMove potentialMove) {
         // create a temp board with the piece in the new location
+        ChessBoard tempBoard = chessBoard;
+        tempBoard.movePiece(potentialMove);
+
         // Check all enemy moves
         // Check if one of those moves is the kings spot
         // return true if it does attack the king
