@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -69,6 +66,13 @@ public class ChessGame {
         BLACK
     }
 
+    private boolean attacksKing(ChessMove potentialMove) {
+        // create a temp board with the piece in the new location
+        // Check all enemy moves
+        // Check if one of those moves is the kings spot
+        // return true if it does attack the king
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -83,9 +87,17 @@ public class ChessGame {
         }
 
         Collection<ChessMove> moves = movingPiece.pieceMoves(chessBoard, startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>();
         // Check if this move puts my king in check
+        for (ChessMove move: moves) {
+            boolean attackKing = attacksKing(move);
+            if (attackKing) {
+                continue;
+            }
+            validMoves.add(move);
+        }
         // If king could be put in check, remove it.
-        return moves;
+        return validMoves;
     }
 
     /**
@@ -94,8 +106,18 @@ public class ChessGame {
      * @param move chess move to perform
      * @throws InvalidMoveException if move is invalid
      */
-    public void makeMove(ChessMove move) {
+    public void makeMove(ChessMove move) throws InvalidMoveException {
+        // Get piece color
+        ChessPosition startLocation = move.getStartPosition();
+        ChessPiece movingPiece = chessBoard.getPiece(startLocation);
+        TeamColor pieceColor = movingPiece.getTeamColor();
+        // Check if it's this pieces turn
+        if (pieceColor != teamTurn) {
+            throw new InvalidMoveException("It is not your turn");
+        }
         // Check if this is a valid move
+        Collection<ChessMove> possibleMoves = validMoves(startLocation);
+
         // if it's not a valid move, throw error
         // Move piece to array spot
 
@@ -103,8 +125,7 @@ public class ChessGame {
         // Check if one of the moves is the opponents king
         // if it is, set flag to true
         if (isKing != null) {
-            TeamColor opponent = teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
-            isInCheck.put(opponent, true);
+            isInCheck.put(pieceColor, true);
         }
     }
 
