@@ -66,14 +66,52 @@ public class ChessGame {
         BLACK
     }
 
+    private TeamColor getMovingColor (ChessMove move) {
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPiece piece = chessBoard.getPiece(startPosition);
+        return piece.getTeamColor();
+    }
+
+    private Collection<ChessMove> getTeamMoves(TeamColor teamColor, ChessBoard board) {
+        // for loop over board to get all piece locations and find their moves
+        Collection<ChessMove> teamMoves = new ArrayList<>();
+        for (int i = 1, j = 1; i < 9 && j < 9; i++) {
+            if (i == 8) {
+                i = 1;
+                j++;
+            }
+            ChessPosition locationPosition = new ChessPosition(i,j);
+            ChessPiece locationPiece = board.getPiece(locationPosition);
+            ChessGame.TeamColor locationColor = locationPiece.getTeamColor();
+            if (locationColor != teamColor) {
+                continue;
+            }
+            Collection<ChessMove> possibleMoves = locationPiece.pieceMoves(board, locationPosition);
+            teamMoves.addAll(possibleMoves);
+        }
+        return teamMoves;
+    }
+
     private boolean attacksKing(ChessMove potentialMove) {
         // create a temp board with the piece in the new location
         ChessBoard tempBoard = chessBoard;
         tempBoard.movePiece(potentialMove);
 
+        // Get opponent color
+        TeamColor myTeam = getMovingColor(potentialMove);
+        TeamColor opponent = myTeam == TeamColor.WHITE ? TeamColor.WHITE : TeamColor.BLACK;
         // Check all enemy moves
+        Collection<ChessMove> moves = getTeamMoves(opponent, tempBoard);
+        // Find our king
+        ChessPosition myKing = tempBoard.getLocationByPiece(new ChessPiece(myTeam, ChessPiece.PieceType.KING));
         // Check if one of those moves is the kings spot
-        // return true if it does attack the king
+        for (ChessMove move: moves) {
+            if(move.getEndPosition().equals(myKing)) {
+                return true;
+            }
+        }
+        // No attacking piece, returning false
+        return false;
     }
 
     /**

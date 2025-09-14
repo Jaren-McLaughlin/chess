@@ -37,6 +37,28 @@ public class ChessBoard {
         return gameBoard[position.getRow() - 1][position.getColumn() - 1];
     }
 
+    public ChessPosition getLocationByPiece(ChessPiece piece) {
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
+        ChessPiece.PieceType pieceType = piece.getPieceType();
+        for (int i = 1, j = 1; i < 9 && j < 9; i++) {
+            if (i == 8) {
+                i = 1;
+                j++;
+            }
+            ChessPosition locationPosition = new ChessPosition(i,j);
+            ChessPiece locationPiece = getPiece(locationPosition);
+            ChessGame.TeamColor locationColor = locationPiece.getTeamColor();
+            ChessPiece.PieceType locationType = locationPiece.getPieceType();
+            if (
+                locationType == pieceType &&
+                locationColor == pieceColor
+            ) {
+                return locationPosition;
+            }
+        }
+        return null;
+    }
+
     public void movePiece(ChessMove myMove) {
         ChessPosition startPosition = myMove.getStartPosition();
         int startRow = startPosition.getRow();
