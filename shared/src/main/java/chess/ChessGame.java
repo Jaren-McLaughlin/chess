@@ -11,13 +11,14 @@ import java.util.*;
 public class ChessGame {
     TeamColor teamTurn;
     ChessBoard chessBoard;
-    Map<TeamColor, Boolean> isInCheck = new HashMap<>();
+//    Map<TeamColor, Boolean> isInCheck = new HashMap<>();
 
     public ChessGame() {
-        this.chessBoard = new ChessBoard();
-        this.teamTurn = TeamColor.WHITE;
-        isInCheck.put(TeamColor.WHITE, false);
-        isInCheck.put(TeamColor.BLACK, false);
+        chessBoard = new ChessBoard();
+        chessBoard.resetBoard();
+        teamTurn = TeamColor.WHITE;
+//        isInCheck.put(TeamColor.WHITE, false);
+//        isInCheck.put(TeamColor.BLACK, false);
     }
 
     /**
@@ -75,41 +76,44 @@ public class ChessGame {
     private Collection<ChessMove> getTeamMoves(TeamColor teamColor, ChessBoard board) {
         // for loop over board to get all piece locations and find their moves
         Collection<ChessMove> teamMoves = new ArrayList<>();
-        for (int i = 1, j = 1; i < 9 && j < 9; i++) {
-            if (i == 8) {
-                i = 1;
-                j++;
+        for (int i = 1; i < 9; i++) {
+            for(int j = 1; j < 9; j++) {
+                ChessPosition locationPosition = new ChessPosition(i, j);
+                ChessPiece locationPiece = board.getPiece(locationPosition);
+                if (locationPiece == null) {
+                    continue;
+                }
+                ChessGame.TeamColor locationColor = locationPiece.getTeamColor();
+                if (locationColor != teamColor) {
+                    continue;
+                }
+                Collection<ChessMove> possibleMoves = locationPiece.pieceMoves(board, locationPosition);
+                teamMoves.addAll(possibleMoves);
             }
-            ChessPosition locationPosition = new ChessPosition(i,j);
-            ChessPiece locationPiece = board.getPiece(locationPosition);
-            if (locationPiece == null) {
-                continue;
-            }
-            ChessGame.TeamColor locationColor = locationPiece.getTeamColor();
-            if (locationColor != teamColor) {
-                continue;
-            }
-            Collection<ChessMove> possibleMoves = locationPiece.pieceMoves(board, locationPosition);
-            teamMoves.addAll(possibleMoves);
         }
         return teamMoves;
     }
 
-    private boolean attacksKing(ChessMove potentialMove) {
-        TeamColor myTeam = getMovingColor(potentialMove);
+    private ChessBoard createTempBoard(ChessMove potentialMove) {
         // create a temp board with the piece in the new location
-        ChessBoard tempBoard = chessBoard;
+        ChessBoard tempBoard = chessBoard.clone();
         tempBoard.movePiece(potentialMove);
+        return tempBoard;
+    }
 
+    private boolean isKingAttacked(ChessBoard tempBoard, TeamColor myTeam) {
         // Get opponent color
-        TeamColor opponent = myTeam == TeamColor.WHITE ? TeamColor.WHITE : TeamColor.BLACK;
+        TeamColor opponent = myTeam == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
         // Check all enemy moves
         Collection<ChessMove> moves = getTeamMoves(opponent, tempBoard);
+        System.out.println(moves);
         // Find our king
         ChessPosition myKing = tempBoard.getLocationByPiece(new ChessPiece(myTeam, ChessPiece.PieceType.KING));
+        System.out.println("King's location: " + myKing);
         // Check if one of those moves is the kings spot
         for (ChessMove move: moves) {
             if(move.getEndPosition().equals(myKing)) {
+                System.out.println(move);
                 return true;
             }
         }
@@ -134,13 +138,17 @@ public class ChessGame {
         Collection<ChessMove> validMoves = new ArrayList<>();
         // Check if this move puts my king in check
         for (ChessMove move: moves) {
-            boolean attackKing = attacksKing(move);
+            ChessBoard tempBoard = createTempBoard(move);
+            TeamColor myTeam = getMovingColor(move);
+            boolean attackKing = isKingAttacked(tempBoard, myTeam);
             if (attackKing) {
                 continue;
             }
+            System.out.println(attackKing + "good move " + move);
             validMoves.add(move);
         }
         // If king could be put in check, remove it.
+        System.out.println(validMoves);
         return validMoves;
     }
 
@@ -154,6 +162,10 @@ public class ChessGame {
         // Get piece color
         ChessPosition startLocation = move.getStartPosition();
         ChessPiece movingPiece = chessBoard.getPiece(startLocation);
+        System.out.println(movingPiece + " " + startLocation);
+        if (movingPiece == null) {
+            throw new InvalidMoveException("There is no piece selected");
+        }
         TeamColor pieceColor = movingPiece.getTeamColor();
         // Check if it's this pieces turn
         if (pieceColor != teamTurn) {
@@ -169,17 +181,20 @@ public class ChessGame {
         // Move piece to spot
         chessBoard.movePiece(move);
         // Check if one of the moves is the opponents king
-        Collection<ChessMove> newMoves = movingPiece.pieceMoves(chessBoard, move.getEndPosition());
+//        Collection<ChessMove> newMoves = movingPiece.pieceMoves(chessBoard, move.getEndPosition());
+
         // Find their king
-        TeamColor opponent = pieceColor == TeamColor.WHITE ? TeamColor.WHITE : TeamColor.BLACK;
-        ChessPosition theirKing = chessBoard.getLocationByPiece(new ChessPiece(opponent, ChessPiece.PieceType.KING));
+        TeamColor opponent = pieceColor == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+//        ChessPosition theirKing = chessBoard.getLocationByPiece(new ChessPiece(opponent, ChessPiece.PieceType.KING));
 
         // if it is in check now, set flag to true
-        for (ChessMove newMove: newMoves) {
-            if (newMove.getEndPosition().equals(theirKing)) {
-                isInCheck.put(opponent, true);
-            }
-        }
+//        for (ChessMove newMove: newMoves) {
+//            if (newMove.getEndPosition().equals(theirKing)) {
+//                isInCheck.put(opponent, true);
+//            }
+//        }
+//        System.out.println(opponent);
+        setTeamTurn(opponent);
     }
 
     /**
@@ -189,7 +204,10 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return isInCheck.get(teamColor);
+        System.out.println(teamColor + " " + chessBoard);
+        return isKingAttacked(chessBoard, teamColor);
+//        isInCheck.put(teamColor, inCheck);
+//        return inCheck;
     }
 
     /**
@@ -200,7 +218,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         // If it's got no valid moves and is in check, then it's in checkmate
-        if (isInCheck.get(teamColor)) {
+        if (isInCheck(teamColor)) {
             // Check if it has any valid moves
 
         }
