@@ -144,7 +144,6 @@ public class ChessGame {
             if (attackKing) {
                 continue;
             }
-            System.out.println(attackKing + "good move " + move);
             validMoves.add(move);
         }
         // If king could be put in check, remove it.
@@ -162,7 +161,7 @@ public class ChessGame {
         // Get piece color
         ChessPosition startLocation = move.getStartPosition();
         ChessPiece movingPiece = chessBoard.getPiece(startLocation);
-        System.out.println(movingPiece + " " + startLocation);
+
         if (movingPiece == null) {
             throw new InvalidMoveException("There is no piece selected");
         }
@@ -178,22 +177,12 @@ public class ChessGame {
         if (!possibleMoves.contains(move)) {
             throw new InvalidMoveException("Not a legal move");
         }
+
         // Move piece to spot
         chessBoard.movePiece(move);
-        // Check if one of the moves is the opponents king
-//        Collection<ChessMove> newMoves = movingPiece.pieceMoves(chessBoard, move.getEndPosition());
 
-        // Find their king
+        // Change team turn
         TeamColor opponent = pieceColor == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
-//        ChessPosition theirKing = chessBoard.getLocationByPiece(new ChessPiece(opponent, ChessPiece.PieceType.KING));
-
-        // if it is in check now, set flag to true
-//        for (ChessMove newMove: newMoves) {
-//            if (newMove.getEndPosition().equals(theirKing)) {
-//                isInCheck.put(opponent, true);
-//            }
-//        }
-//        System.out.println(opponent);
         setTeamTurn(opponent);
     }
 
@@ -204,10 +193,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        System.out.println(teamColor + " " + chessBoard);
         return isKingAttacked(chessBoard, teamColor);
-//        isInCheck.put(teamColor, inCheck);
-//        return inCheck;
     }
 
     /**
@@ -219,8 +205,15 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         // If it's got no valid moves and is in check, then it's in checkmate
         if (isInCheck(teamColor)) {
-            // Check if it has any valid moves
-
+            Collection<ChessMove> myTeamMoves = getTeamMoves(teamColor, chessBoard);
+            Collection<ChessMove> validMoves = new ArrayList<>();
+            for (ChessMove move : myTeamMoves) {
+                Collection<ChessMove> goodMoves = validMoves(move.getStartPosition());
+                if (!goodMoves.isEmpty()) {
+                    validMoves.addAll(goodMoves);
+                }
+            }
+            return validMoves.isEmpty();
         }
         return false;
     }
@@ -234,8 +227,11 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         // if it's got no valid moves, it's a stalemate
+        ChessPosition kingLocation = chessBoard.getLocationByPiece(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+        Collection<ChessMove> kingCheckMated = validMoves(kingLocation);
 
-        return false;
+        // Doesn't quite work when the game is in start position because king cant move...
+        return !isInCheck(teamColor) && kingCheckMated.isEmpty();
     }
 
     /**

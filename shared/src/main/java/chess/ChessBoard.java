@@ -45,7 +45,6 @@ public class ChessBoard implements Cloneable {
             for(int j = 1; j < 9; j++) {
                 ChessPosition locationPosition = new ChessPosition(i,j);
                 ChessPiece locationPiece = getPiece(locationPosition);
-//            System.out.println(locationPiece);
                 if (locationPiece == null) {
                     continue;
                 }
@@ -72,14 +71,12 @@ public class ChessBoard implements Cloneable {
         int endCol = endPosition.getColumn();
 
         ChessPiece piece = getPiece(startPosition);
-        System.out.println("The piece, if promoted should be different" + piece.getPieceType());
         if (
             piece.getPieceType() == ChessPiece.PieceType.PAWN &&
             myMove.getPromotionPiece() != null
         ) {
             piece.updatePieceType(myMove.getPromotionPiece());
         }
-        System.out.println("The piece, if promoted should be different" + piece.getPieceType());
         gameBoard[startRow - 1][startCol - 1] = null;
         gameBoard[endRow - 1][endCol - 1] = piece;
     }
