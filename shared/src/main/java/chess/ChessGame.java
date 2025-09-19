@@ -196,6 +196,19 @@ public class ChessGame {
         return isKingAttacked(chessBoard, teamColor);
     }
 
+    // Quick little helper function for check and stalemate
+    private Collection<ChessMove> validTeamMoves(TeamColor teamColor) {
+        Collection<ChessMove> myTeamMoves = getTeamMoves(teamColor, chessBoard);
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        for (ChessMove move : myTeamMoves) {
+            Collection<ChessMove> goodMoves = validMoves(move.getStartPosition());
+            if (!goodMoves.isEmpty()) {
+                validMoves.addAll(goodMoves);
+            }
+        }
+        return validMoves;
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -205,14 +218,7 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         // If it's got no valid moves and is in check, then it's in checkmate
         if (isInCheck(teamColor)) {
-            Collection<ChessMove> myTeamMoves = getTeamMoves(teamColor, chessBoard);
-            Collection<ChessMove> validMoves = new ArrayList<>();
-            for (ChessMove move : myTeamMoves) {
-                Collection<ChessMove> goodMoves = validMoves(move.getStartPosition());
-                if (!goodMoves.isEmpty()) {
-                    validMoves.addAll(goodMoves);
-                }
-            }
+            Collection<ChessMove> validMoves = validTeamMoves(teamColor);
             return validMoves.isEmpty();
         }
         return false;
@@ -227,11 +233,8 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         // if it's got no valid moves, it's a stalemate
-        ChessPosition kingLocation = chessBoard.getLocationByPiece(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
-        Collection<ChessMove> kingCheckMated = validMoves(kingLocation);
-
-        // Doesn't quite work when the game is in start position because king cant move...
-        return !isInCheck(teamColor) && kingCheckMated.isEmpty();
+        Collection<ChessMove> validMoves = validTeamMoves(teamColor);
+        return !isInCheck(teamColor) && validMoves.isEmpty();
     }
 
     /**
