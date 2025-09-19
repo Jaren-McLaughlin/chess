@@ -83,22 +83,23 @@ public class ChessPiece implements Cloneable {
         PieceType.KING, new int[][] {{1,0},{0,1},{-1,0},{0,-1},{1,1},{-1,1},{1,-1},{-1,-1}}
     );
 
-    private record moveSet(ChessPosition move, boolean isAttack) {};
-    private moveSet getMove(int newRow, int newCol, ChessBoard board) {
+    private boolean getMove(int newRow, int newCol, ChessBoard board, Collection<ChessMove> moves, ChessPosition myPosition) {
         ChessPosition newMove;
         try {
             newMove = new ChessPosition(newRow, newCol);
         } catch (Exception e) {
-            return new moveSet(null, false);
+            return false;
         }
         ChessPiece isPiece = board.getPiece(newMove);
         if (isPiece != null) {
             if (this.pieceColor != isPiece.pieceColor) {
-                return new moveSet(newMove, true);
+                moves.add(new ChessMove(myPosition, newMove, null));
+                return false;
             }
-            return new moveSet(null, false);
+            return false;
         }
-        return new moveSet(newMove, false);
+        moves.add(new ChessMove(myPosition, newMove, null));
+        return true;
     };
 
     public void updatePieceType (PieceType newPiece) {
@@ -131,15 +132,10 @@ public class ChessPiece implements Cloneable {
                 while(true) {
                     newRow = newRow + direction[0];
                     newCol = newCol + direction[1];
-                    moveSet movement = getMove(newRow, newCol, board);
-                    if (movement.move == null) {
+                    boolean moreMoves = getMove(newRow, newCol, board, moves, myPosition);
+                    if (!moreMoves) {
                         break;
                     }
-                    if (movement.isAttack) {
-                        moves.add(new ChessMove(myPosition, movement.move, null));
-                        break;
-                    }
-                    moves.add(new ChessMove(myPosition, movement.move, null));
                 }
             }
         }
@@ -153,16 +149,7 @@ public class ChessPiece implements Cloneable {
             for (int[] direction : directions) {
                 int newRow = myPosition.getRow() + direction[0];
                 int newCol = myPosition.getColumn() + direction[1];
-
-                moveSet movement = getMove(newRow, newCol, board);
-                if (movement.move == null) {
-                    continue;
-                }
-                if (movement.isAttack) {
-                    moves.add(new ChessMove(myPosition, movement.move, null));
-                    continue;
-                }
-                moves.add(new ChessMove(myPosition, movement.move, null));
+                getMove(newRow, newCol, board, moves, myPosition);
             }
         }
         // Pawn Logic
@@ -199,18 +186,14 @@ public class ChessPiece implements Cloneable {
                 if (canAttack != null && this.pieceColor != canAttack.pieceColor) {
                     pawnMoves.add(attack1);
                 }
-            } catch (Exception e) {
-                System.out.println("meh");
-            }
+            } catch (Exception ignored) {}
             try {
                 ChessPosition attack2 = new ChessPosition(newRow, myPosition.getColumn() + 1);
                 ChessPiece canAttack = board.getPiece(attack2);
                 if (canAttack != null && this.pieceColor != canAttack.pieceColor) {
                     pawnMoves.add(attack2);
                 }
-            } catch (Exception e) {
-                System.out.println("meh");
-            }
+            } catch (Exception ignored) {}
 
             for (ChessPosition pawnMove : pawnMoves) {
                 if (newRow == 1 || newRow == 8) {
