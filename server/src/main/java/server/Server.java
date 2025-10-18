@@ -23,45 +23,61 @@ public class Server {
                 .delete("/db", this::clearDb)
                 .get("/game", this::getGameList)
                 .post("/game", this::createGame)
-                .put("/game", this::joinGame);
+                .put("/game", this::joinGame)
+//                .exception()
+                ;
     }
 
     private void logout (Context context) {
         // authorization: <authToken>
+        authService.verifyToken();
+        userService.logout();
     }
 
     private void createUser (Context context) {
         // body: { "username":"", "password":"", "email":"" }
         UserData userData = new Gson().fromJson(context.body(), UserData.class);
         // response: { "username":"", "authToken":"" }
+        AuthData response = userService.createUser(userData);
+        context.json(new Gson().toJson(response));
     }
 
     private void login (Context context) {
         // body: { "username":"", "password":"" }
         UserData userData = new Gson().fromJson(context.body(), UserData.class);
         // response: { "username":"", "authToken":"" }
+        AuthData response = userService.login(userData);
+        context.json(new Gson().toJson(response));
     }
 
     private void clearDb (Context context) {
-
+        gameService.clearDb();
     }
 
     private void getGameList (Context context) {
         // 	authorization: <authToken>
+        authService.verifyToken();
         // response: { "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
+        GameData response = gameService.getGameList();
+        context.json(new Gson().toJson(response));
     }
 
     private void createGame (Context context) {
         // 	authorization: <authToken>
+        authService.verifyToken();
         // body: { "gameName":"" }
         GameData gameData = new Gson().fromJson(context.body(), GameData.class);
+        GameData response = gameService.createGame(gameData);
         // response: { "gameID": 1234 }
+        context.json(new Gson().toJson(response));
     }
 
     private void joinGame (Context context) {
         // 	authorization: <authToken>
+        authService.verifyToken();
         // body: { "playerColor":"WHITE/BLACK", "gameID": 1234 }
-        GameData gameData = new Gson().fromJson(context.body(), GameData.class);
+        JoinGameData joinGameData = new Gson().fromJson(context.body(), JoinGameData.class);
+        gameService.joinGame(joinGameData);
     }
 
     public int run(int desiredPort) {
