@@ -20,4 +20,7 @@ public class AuthMemoryDao {
     public void deleteUserAuth(String authToken) {
         auth.remove(authToken);
     }
+    public void clearDb() {
+        auth.clear();
+    }
 }

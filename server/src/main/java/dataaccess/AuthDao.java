@@ -22,4 +22,8 @@ public class AuthDao {
     public void deleteUserAuth(String authToken) {
         authMemoryDao.deleteUserAuth(authToken);
     }
+
+    public void deleteAuthTableRecords() {
+        authMemoryDao.clearDb();
+    }
 }

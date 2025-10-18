@@ -3,6 +3,7 @@ package service;
 import model.*;
 import dataaccess.*;
 import java.util.UUID;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private final AuthDao authDao = new AuthDao();
@@ -13,17 +14,19 @@ public class UserService {
 
     public AuthData createUser (UserData userData) {
         // hash password
-        String hashPassword = ;
+        String hashPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
         // Create new record with hashed password
         UserData withHash = new UserData(userData.username(), hashPassword, userData.email());
-        userDao.addUser(userData);
+        userDao.addUser(withHash);
         return authDao.addAuthData(userData.username(), generateToken());
     }
 
     public AuthData login(UserData userData) {
-        userDao.getUserDetails(userData);
+        String passwordHash = userDao.getPasswordHash(userData.username());
         //verify passwords match
-
+        if (!BCrypt.checkpw(userData.password(), passwordHash)) {
+            throw new Exception("ahh invalid password");
+        };
         return authDao.addAuthData(userData.username(), generateToken());
     }
 
