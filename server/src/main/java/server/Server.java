@@ -9,13 +9,12 @@ import service.*;
 
 public class Server {
     private final Javalin javalin;
-    private final AuthService authService = new AuthService();
     private final GameService gameService = new GameService();
     private final UserService userService = new UserService();
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
-        // Auth Handlers
+        // User Handlers
                 .delete("/session", this::logout)
                 .post("/session", this::createUser)
                 .post("/user", this::login)
@@ -30,8 +29,9 @@ public class Server {
 
     private void logout (Context context) {
         // authorization: <authToken>
-        authService.verifyToken();
-        userService.logout();
+        String authToken = context.header("authToken");
+        userService.verifyToken(authToken);
+        userService.logout(authToken);
     }
 
     private void createUser (Context context) {
@@ -55,16 +55,15 @@ public class Server {
     }
 
     private void getGameList (Context context) {
-        // 	authorization: <authToken>
-        authService.verifyToken();
-        // response: { "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}
-        GameData response = gameService.getGameList();
+        String authToken = context.header("authToken");
+        userService.verifyToken(authToken);
+        GameListData response = gameService.getGameList();
         context.json(new Gson().toJson(response));
     }
 
     private void createGame (Context context) {
-        // 	authorization: <authToken>
-        authService.verifyToken();
+        String authToken = context.header("authToken");
+        userService.verifyToken(authToken);
         // body: { "gameName":"" }
         GameData gameData = new Gson().fromJson(context.body(), GameData.class);
         GameData response = gameService.createGame(gameData);
@@ -74,8 +73,8 @@ public class Server {
 
     private void joinGame (Context context) {
         // 	authorization: <authToken>
-        authService.verifyToken();
-        // body: { "playerColor":"WHITE/BLACK", "gameID": 1234 }
+        String authToken = context.header("authToken");
+        userService.verifyToken(authToken);
         JoinGameData joinGameData = new Gson().fromJson(context.body(), JoinGameData.class);
         gameService.joinGame(joinGameData);
     }
