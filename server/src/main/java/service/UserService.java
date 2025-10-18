@@ -44,4 +44,9 @@ public class UserService {
         // if return is null throw no auth error
         // else returns
     }
+
+    public void clearDb() {
+        authDao.deleteAuthTableRecords();
+        userDao.deleteUserTableRecords();
+    }
 }

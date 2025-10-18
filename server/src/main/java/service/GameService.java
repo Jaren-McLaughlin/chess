@@ -38,14 +38,30 @@ public class GameService {
         ) {
             throw new ResponseException();
         }
-        gameDao.addToGame(joinGameData);
+        if (Objects.equals(joinGameData.playerColor(), TeamColor.BLACK.toString())) {
+            GameData newGameData = new GameData(
+                    gameDetails.gameID(),
+                    gameDetails.whiteUsername(),
+                    joinGameData.playerColor(),
+                    gameDetails.gameName(),
+                    gameDetails.game()
+            );
+            gameDao.insertIntoGame(newGameData);
+        }
+        if (Objects.equals(joinGameData.playerColor(), TeamColor.WHITE.toString())) {
+            GameData newGameData = new GameData(
+                    gameDetails.gameID(),
+                    joinGameData.playerColor(),
+                    gameDetails.blackUsername(),
+                    gameDetails.gameName(),
+                    gameDetails.game()
+            );
+            gameDao.insertIntoGame(newGameData);
+        }
     }
 
     // Probably could be abstracted to it's only class if desired
     public void clearDb() {
-        // call each delete dao
-        authDao.clearTable();
-        gameDao.clearTable();
-        userDao.clearTable();
+        gameDao.deleteGameTableRecords();
     }
 }

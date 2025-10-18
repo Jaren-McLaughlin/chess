@@ -52,6 +52,7 @@ public class Server {
 
     private void clearDb (Context context) {
         gameService.clearDb();
+        userService.clearDb();
     }
 
     private void getGameList (Context context) {
