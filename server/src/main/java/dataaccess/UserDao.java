@@ -1,21 +1,13 @@
 package dataaccess;
 
 import dataaccess.MemoryDataAccess.UserMemoryDao;
-import exception.HttpException;
 import model.*;
 
-public class UserDao {
-    private final UserMemoryDao userMemoryDao = new UserMemoryDao();
+public interface UserDao {
     // Create user
-    public void addUser(UserData userData) throws HttpException {
-        userMemoryDao.addUser(userData);
-    }
+    void addUser(UserData userData) throws DataAccessException;
     // Get User
-    public String getPasswordHash(String username) throws HttpException {
-        return userMemoryDao.getPasswordHash(username);
-    }
+    String getPasswordHash(String username) throws DataAccessException;
     // Delete User
-    public void deleteUserTableRecords() throws HttpException {
-        userMemoryDao.clearDb();
-    }
+    void clearDb() throws DataAccessException;
 }

@@ -26,8 +26,13 @@ public class Server {
             .get("/game", this::getGameList)
             .post("/game", this::createGame)
             .put("/game", this::joinGame)
-            .exception(HttpException.class, (e, ctx) -> {
-                ctx.status(e.getStatus()).json(Map.of("error", e.getMessage()));
+            .exception(HttpException.class, (error, context) -> {
+                context.status(error.getStatus()).json(Map.of("error", error.getMessage()));
+            })
+            .exception(Exception.class, (error, context) -> {
+                context.status(500).json(Map.of(
+                "error", error.getMessage()
+                ));
             });
     }
 

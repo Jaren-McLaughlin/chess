@@ -47,7 +47,7 @@ public class GameService {
                     gameDetails.gameName(),
                     gameDetails.game()
             );
-            gameDao.insertIntoGame(newGameData);
+            gameDao.insertUserIntoGame(newGameData);
         }
         if (joinGameData.playerColor() == TeamColor.WHITE) {
             GameData newGameData = new GameData(
@@ -57,12 +57,12 @@ public class GameService {
                     gameDetails.gameName(),
                     gameDetails.game()
             );
-            gameDao.insertIntoGame(newGameData);
+            gameDao.insertUserIntoGame(newGameData);
         }
     }
 
     // Probably could be abstracted to it's only class if desired
     public void clearDb() throws HttpException {
-        gameDao.deleteGameTableRecords();
+        gameDao.clearDb();
     }
 }

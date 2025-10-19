@@ -2,8 +2,9 @@ package dataaccess.MemoryDataAccess;
 
 import model.UserData;
 import java.util.HashMap;
+import dataaccess.UserDao;
 
-public class UserMemoryDao {
+public class UserMemoryDao implements UserDao {
     private final HashMap<String, UserData> user = new HashMap<>();
     public void addUser(UserData userData) {
         user.put(userData.username(), userData);

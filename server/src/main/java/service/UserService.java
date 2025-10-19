@@ -20,7 +20,7 @@ public class UserService {
         // Create new record with hashed password
 //        UserData withHash = new UserData(userData.username(), hashPassword, userData.email());
         userDao.addUser(userData);
-        return authDao.addAuthData(userData.username(), generateToken());
+        return authDao.addUserAuth(userData.username(), generateToken());
     }
 
     public AuthData login(UserData userData) throws HttpException {
@@ -30,7 +30,7 @@ public class UserService {
         if (Objects.equals(userData.password(), passwordHash)) {
             throw HttpException.unauthorized("unauthorized");
         };
-        return authDao.addAuthData(userData.username(), generateToken());
+        return authDao.addUserAuth(userData.username(), generateToken());
     }
 
     public void logout(String authToken) throws HttpException {
@@ -41,15 +41,16 @@ public class UserService {
         // Reach out to
         try {
             authDao.getUserByToken(authToken);
-        } catch () {
+        } catch (DataAccessException error) {
             // not auth error.
+            throw HttpException.unauthorized("Unauthorized");
         }
         // if return is null throw no auth error
         // else returns
     }
 
     public void clearDb() throws HttpException {
-        authDao.deleteAuthTableRecords();
-        userDao.deleteUserTableRecords();
+        authDao.clearDb();
+        userDao.clearDb();
     }
 }

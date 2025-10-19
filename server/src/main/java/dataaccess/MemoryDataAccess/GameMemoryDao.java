@@ -1,11 +1,11 @@
 package dataaccess.MemoryDataAccess;
 
-import model.GameData;
-import model.GameListData;
+import model.*;
+import dataaccess.GameDao;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class GameMemoryDao {
+public class GameMemoryDao implements GameDao {
     private final HashMap<Integer, GameData> game = new HashMap<>();
     private int numberOfGames = 0;
     public GameData addGame(GameData gameData) {
