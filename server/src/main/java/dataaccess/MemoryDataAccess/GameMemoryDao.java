@@ -2,7 +2,6 @@ package dataaccess.MemoryDataAccess;
 
 import model.GameData;
 import model.GameListData;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 

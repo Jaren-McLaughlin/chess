@@ -9,9 +9,9 @@ public class AuthMemoryDao {
         auth.put(authToken, username);
     }
 
-    public void getUserByToken(String authToken) {
+    public String getUserByToken(String authToken) {
         try {
-            String username = auth.get(authToken);
+            return auth.get(authToken);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
