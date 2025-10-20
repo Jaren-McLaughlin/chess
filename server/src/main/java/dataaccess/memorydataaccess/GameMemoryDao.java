@@ -1,4 +1,4 @@
-package dataaccess.MemoryDataAccess;
+package dataaccess.memorydataaccess;
 
 import model.*;
 import dataaccess.GameDao;

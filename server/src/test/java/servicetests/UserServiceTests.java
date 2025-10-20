@@ -1,7 +1,7 @@
-package serviceTests;
+package servicetests;
 
-import dataaccess.MemoryDataAccess.AuthMemoryDao;
-import dataaccess.MemoryDataAccess.UserMemoryDao;
+import dataaccess.memorydataaccess.AuthMemoryDao;
+import dataaccess.memorydataaccess.UserMemoryDao;
 import exception.HttpException;
 import model.*;
 import org.junit.jupiter.api.AfterEach;
@@ -48,7 +48,9 @@ public class UserServiceTests {
         UserData userData = new UserData("MyUsername", "My Secure Password", "test@testing.test");
         userService.createUser(userData);
 
-        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->   userService.login(new UserData("MyUsername", "Bad Password", null)));
+        HttpException thrownError = Assertions.assertThrows(
+            HttpException.class, () ->   userService.login(new UserData("MyUsername", "Bad Password", null))
+        );
         Assertions.assertEquals(401, thrownError.getStatus());
         Assertions.assertEquals("Error: Unauthorized", thrownError.getMessage());
     }

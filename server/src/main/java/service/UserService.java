@@ -5,7 +5,6 @@ import dataaccess.*;
 import java.util.Objects;
 import java.util.UUID;
 import exception.HttpException;
-//import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private final AuthDao authDao;
@@ -21,9 +20,6 @@ public class UserService {
     }
 
     public AuthData createUser (UserData userData) throws HttpException {
-        // hash password (Commented out cause I don't know why the import doesn't work)
-//        String hashPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
-//        UserData withHash = new UserData(userData.username(), hashPassword, userData.email());
         if (userData.email() == null) {
             throw HttpException.badRequest("Error: no email");
         }
@@ -65,7 +61,6 @@ public class UserService {
         } catch (DataAccessException error) {
             throw HttpException.unauthorized("Error: user not found");
         }
-//        if (!BCrypt.checkpw(userData.password(), passwordHash)) {
         if (!Objects.equals(userData.password(), passwordHash)) {
             throw HttpException.unauthorized("Error: Unauthorized");
         }

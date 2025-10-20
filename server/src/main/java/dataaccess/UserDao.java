@@ -1,6 +1,5 @@
 package dataaccess;
 
-import dataaccess.MemoryDataAccess.UserMemoryDao;
 import model.*;
 
 public interface UserDao {

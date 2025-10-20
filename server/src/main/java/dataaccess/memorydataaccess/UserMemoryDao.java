@@ -1,11 +1,9 @@
-package dataaccess.MemoryDataAccess;
+package dataaccess.memorydataaccess;
 
 import dataaccess.DataAccessException;
 import model.UserData;
 import java.util.HashMap;
 import dataaccess.UserDao;
-
-import javax.xml.crypto.Data;
 
 public class UserMemoryDao implements UserDao {
     private final HashMap<String, UserData> user = new HashMap<>();

@@ -1,7 +1,7 @@
-package serviceTests;
+package servicetests;
 
 import chess.ChessGame.TeamColor;
-import dataaccess.MemoryDataAccess.GameMemoryDao;
+import dataaccess.memorydataaccess.GameMemoryDao;
 import exception.HttpException;
 import model.*;
 import org.junit.jupiter.api.AfterEach;
