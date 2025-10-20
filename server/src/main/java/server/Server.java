@@ -41,47 +41,27 @@ public class Server {
                 context.status(error.getStatus())
                 .json(error.toJson());
             })
-//            .exception(HttpException.class, this::temp)
             .exception(Exception.class, (error, context) -> {
                 context.status(500).json(Map.of(
                 "error", error.getMessage()
                 ));
             });
     }
-//
-//    public void addServices(GameService gameService, UserService userService, AuthDao authDao) {
-//        this.gameService = gameService;
-//        this.userService = userService;
-//        this.authDao = authDao;
-//    }
-//
-//    private void temp(HttpException ex, Context ctx) {
-//        System.out.println("My results of an error: " + ex.getStatus() + " The full ex object " + ex.toJson());
-//        ctx.status(ex.getStatus());
-//        ctx.json(ex.toJson());
-//    }
     private void logout (Context context) throws HttpException {
-        // authorization: <authToken>
         String authToken = context.header("Authorization");
         userService.verifyToken(authToken);
         userService.logout(authToken);
     }
 
     private void createUser (Context context) throws HttpException {
-        // body: { "username":"", "password":"", "email":"" }
         UserData userData = new Gson().fromJson(context.body(), UserData.class);
-        // response: { "username":"", "Authorization":"" }
         AuthData response = userService.createUser(userData);
         context.json(new Gson().toJson(response));
     }
 
     private void login (Context context) throws HttpException {
-        // body: { "username":"", "password":"" }
         UserData userData = new Gson().fromJson(context.body(), UserData.class);
-        System.out.println("What is being passed here: " + userData);
-        // response: { "username":"", "Authorization":"" }
         AuthData response = userService.login(userData);
-        System.out.println("What is being returned here: " + response);
         context.json(new Gson().toJson(response));
     }
 
@@ -92,29 +72,20 @@ public class Server {
 
     private void getGameList (Context context) throws HttpException {
         String authToken = context.header("Authorization");
-        System.out.println("hello? ");
-        context.headerMap().forEach((key, value) -> {
-            System.out.println(key + " : " + value);
-        });
         userService.verifyToken(authToken);
-        System.out.println("why doesn't htis work????");
         GameListData response = gameService.getGameList();
-        System.out.println("Some response of games: "+ response);
         context.json(new Gson().toJson(response));
     }
 
     private void createGame (Context context) throws HttpException {
         String authToken = context.header("Authorization");
         userService.verifyToken(authToken);
-//        String username = authDao.getUserByToken(authToken);
         GameData gameData = new Gson().fromJson(context.body(), GameData.class);
         GameData response = gameService.createGame(gameData);
-        // response: { "gameID": 1234 }
         context.json(new Gson().toJson(response));
     }
 
     private void joinGame (Context context) throws HttpException {
-        // 	authorization: <authToken>
         String authToken = context.header("Authorization");
         userService.verifyToken(authToken);
         String username;

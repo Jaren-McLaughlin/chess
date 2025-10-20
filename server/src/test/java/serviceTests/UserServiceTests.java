@@ -1,14 +1,12 @@
 package serviceTests;
 
 import dataaccess.MemoryDataAccess.AuthMemoryDao;
-import dataaccess.MemoryDataAccess.GameMemoryDao;
 import dataaccess.MemoryDataAccess.UserMemoryDao;
 import exception.HttpException;
 import model.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import service.GameService;
 import service.UserService;
 
 public class UserServiceTests {

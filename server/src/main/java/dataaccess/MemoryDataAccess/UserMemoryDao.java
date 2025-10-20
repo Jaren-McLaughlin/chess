@@ -12,12 +12,8 @@ public class UserMemoryDao implements UserDao {
     public void addUser(UserData userData) {
         user.put(userData.username(), userData);
     }
-    // Get User
     public String getPasswordHash(String username) throws DataAccessException {
-        System.out.println("Hashmap detials? " + user);
-        System.out.println("Extra stuff" + username);
         UserData userDetails = user.get(username);
-        System.out.println("The user details: " + userDetails);
         try {
             return userDetails.password();
         } catch (Exception error) {

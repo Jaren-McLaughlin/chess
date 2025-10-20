@@ -23,7 +23,6 @@ public class UserService {
     public AuthData createUser (UserData userData) throws HttpException {
         // hash password (Commented out cause I don't know why the import doesn't work)
 //        String hashPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
-        // Create new record with hashed password
 //        UserData withHash = new UserData(userData.username(), hashPassword, userData.email());
         if (userData.email() == null) {
             throw HttpException.badRequest("Error: no email");
@@ -52,13 +51,11 @@ public class UserService {
 
     public AuthData login(UserData userData) throws HttpException {
         if (userData.username() == null) {
-            System.out.println("Made it in to throw an error");
             throw HttpException.badRequest("Error: username not found");
         }
         if (userData.password() == null) {
             throw HttpException.badRequest("Error: password not found");
         }
-        System.out.println("This should be called and do something " + userData);
         String passwordHash;
         try{
             passwordHash = userDao.getPasswordHash(userData.username());
@@ -66,11 +63,8 @@ public class UserService {
                 throw HttpException.unauthorized("Error: user not found");
             }
         } catch (DataAccessException error) {
-            System.out.println("was this called");
             throw HttpException.unauthorized("Error: user not found");
         }
-        System.out.println("Should have errored out " + passwordHash);
-        //verify passwords match
 //        if (!BCrypt.checkpw(userData.password(), passwordHash)) {
         if (!Objects.equals(userData.password(), passwordHash)) {
             throw HttpException.unauthorized("Error: Unauthorized");
@@ -102,19 +96,14 @@ public class UserService {
     }
 
     public void verifyToken (String authToken) throws HttpException {
-        // Reach out to
-        System.out.println("Verify is called?");
         try {
             String username = authDao.getUserByToken(authToken);
             if (username == null) {
                 throw HttpException.unauthorized("Error: Unauthorized");
             }
         } catch (DataAccessException error) {
-            // not auth error.
             throw HttpException.internalServerError("Error: Something went wrong " + error);
         }
-        // if return is null throw no auth error
-        // else returns
     }
 
     public void clearDb() throws HttpException {
