@@ -8,8 +8,14 @@ import exception.HttpException;
 //import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
-    private final AuthDao authDao = new AuthDao();
-    private final UserDao userDao = new UserDao();
+    private final AuthDao authDao;
+    private final UserDao userDao;
+
+    public UserService (AuthDao authDao, UserDao userDao) {
+        this.authDao = authDao;
+        this.userDao = userDao;
+    }
+
     public static String generateToken() {
         return UUID.randomUUID().toString();
     }
@@ -19,22 +25,39 @@ public class UserService {
 //        String hashPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
         // Create new record with hashed password
 //        UserData withHash = new UserData(userData.username(), hashPassword, userData.email());
-        userDao.addUser(userData);
-        return authDao.addUserAuth(userData.username(), generateToken());
+        try {
+            userDao.addUser(userData);
+            return authDao.addUserAuth(userData.username(), generateToken());
+        } catch (DataAccessException error) {
+            throw HttpException.badRequest("Bad Request: " + error);
+        }
     }
 
     public AuthData login(UserData userData) throws HttpException {
-        String passwordHash = userDao.getPasswordHash(userData.username());
+        String passwordHash;
+        try{
+            passwordHash = userDao.getPasswordHash(userData.username());
+        } catch (DataAccessException error) {
+            throw HttpException.badRequest("Bad Request: " + error);
+        }
         //verify passwords match
 //        if (!BCrypt.checkpw(userData.password(), passwordHash)) {
         if (Objects.equals(userData.password(), passwordHash)) {
             throw HttpException.unauthorized("unauthorized");
         };
-        return authDao.addUserAuth(userData.username(), generateToken());
+        try {
+            return authDao.addUserAuth(userData.username(), generateToken());
+        } catch (DataAccessException error) {
+            throw HttpException.badRequest("Bad Request: " + error);
+        }
     }
 
     public void logout(String authToken) throws HttpException {
-        authDao.deleteUserAuth(authToken);
+        try{
+            authDao.deleteUserAuth(authToken);
+        } catch (DataAccessException error) {
+            throw HttpException.badRequest("Bad Request: " + error);
+        }
     }
 
     public void verifyToken (String authToken) throws HttpException {
@@ -50,7 +73,11 @@ public class UserService {
     }
 
     public void clearDb() throws HttpException {
-        authDao.clearDb();
-        userDao.clearDb();
+        try {
+            authDao.clearDb();
+            userDao.clearDb();
+        } catch (DataAccessException error) {
+            throw HttpException.badRequest("Bad Request: " + error);
+        }
     }
 }

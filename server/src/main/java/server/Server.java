@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.AuthDao;
+import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.*;
@@ -11,11 +12,14 @@ import java.util.Map;
 
 public class Server {
     private final Javalin javalin;
-    private final GameService gameService = new GameService();
-    private final UserService userService = new UserService();
-    private final AuthDao authDao = new AuthDao();
+    private final GameService gameService;
+    private final UserService userService;
+    private final AuthDao authDao;
 
-    public Server() {
+    public Server(GameService gameService, UserService userService, AuthDao authDao) {
+        this.gameService = gameService;
+        this.userService = userService;
+        this.authDao = authDao;
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
         // User Handlers
             .delete("/session", this::logout)
@@ -85,7 +89,12 @@ public class Server {
         // 	authorization: <authToken>
         String authToken = context.header("authToken");
         userService.verifyToken(authToken);
-        String username = authDao.getUserByToken(authToken);
+        String username;
+        try {
+            username = authDao.getUserByToken(authToken);
+        } catch (DataAccessException error) {
+            throw HttpException.badRequest("Failed to get user");
+        }
         JoinGameData joinGameData = new Gson().fromJson(context.body(), JoinGameData.class);
         gameService.joinGame(joinGameData, username);
     }
