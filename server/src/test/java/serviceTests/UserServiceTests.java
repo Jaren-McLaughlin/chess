@@ -28,7 +28,11 @@ public class UserServiceTests {
 
     @Test
     void userAlreadyTaken() throws HttpException {
-
+        UserData userData = new UserData("MyUsername", "My Secure Password", "test@testing.test");
+        userService.createUser(userData);
+        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->   userService.createUser(userData));
+        Assertions.assertEquals(403, thrownError.getStatus());
+        Assertions.assertEquals("Error: account already taken", thrownError.getMessage());
     }
 
     @Test
@@ -48,36 +52,47 @@ public class UserServiceTests {
 
         HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->   userService.login(new UserData("MyUsername", "Bad Password", null)));
         Assertions.assertEquals(401, thrownError.getStatus());
-        Assertions.assertEquals("unauthorized", thrownError.getMessage());
+        Assertions.assertEquals("Error: Unauthorized", thrownError.getMessage());
     }
 
     @Test
-    void logout() throws  HttpException {
-
+    void logout() throws HttpException {
+        UserData userData = new UserData("username", "passowrd", "email");
+        AuthData authData = userService.createUser(userData);
+        userService.logout(authData.authToken());
+        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->   userService.verifyToken(authData.authToken()));
+        Assertions.assertEquals(401, thrownError.getStatus());
+        Assertions.assertEquals("Error: Unauthorized", thrownError.getMessage());
     }
 
     @Test
     void cannotLogOut() throws HttpException {
-
+        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->   userService.logout("10231"));
+        Assertions.assertEquals(401, thrownError.getStatus());
+        Assertions.assertEquals("Error: Can't delete nonexistant", thrownError.getMessage());
     }
 
     @Test
     void verifyToken() throws  HttpException {
-
+        AuthData authData = userService.createUser(new UserData("test", "test", "test"));
+        Assertions.assertDoesNotThrow(() -> userService.verifyToken(authData.authToken()));
     }
 
     @Test
     void invalidAuthToken() throws HttpException {
-
+        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->   userService.verifyToken("10231"));
+        Assertions.assertEquals(401, thrownError.getStatus());
+        Assertions.assertEquals("Error: Unauthorized", thrownError.getMessage());
     }
 
     @Test
     void clearDb() throws  HttpException {
+        AuthData user = userService.createUser(new UserData("test", "test", "test"));
 
-    }
+        userService.clearDb();
 
-    @Test
-    void somethingNegative() throws HttpException {
-
+        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->   userService.verifyToken(user.authToken()));
+        Assertions.assertEquals(401, thrownError.getStatus());
+        Assertions.assertEquals("Error: Unauthorized", thrownError.getMessage());
     }
 }
