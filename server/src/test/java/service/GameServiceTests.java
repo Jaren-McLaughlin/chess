@@ -1,4 +1,4 @@
-package servicetests;
+package service;
 
 import chess.ChessGame.TeamColor;
 import dataaccess.memorydataaccess.GameMemoryDao;
@@ -7,7 +7,6 @@ import model.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import service.GameService;
 
 
 public class GameServiceTests {

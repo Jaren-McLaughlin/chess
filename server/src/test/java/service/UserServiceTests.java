@@ -1,4 +1,4 @@
-package servicetests;
+package service;
 
 import dataaccess.memorydataaccess.AuthMemoryDao;
 import dataaccess.memorydataaccess.UserMemoryDao;
@@ -7,7 +7,6 @@ import model.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import service.UserService;
 
 public class UserServiceTests {
     private final UserService userService = new UserService(new AuthMemoryDao(), new UserMemoryDao());
