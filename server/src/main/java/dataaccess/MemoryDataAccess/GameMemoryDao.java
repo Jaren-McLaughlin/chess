@@ -31,5 +31,6 @@ public class GameMemoryDao implements GameDao {
     }
     public void clearDb() {
         game.clear();
+        numberOfGames = 0;
     }
 }

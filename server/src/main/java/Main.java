@@ -11,7 +11,8 @@ public class Main {
         UserDao userDao = new UserMemoryDao();
         GameService gameService = new GameService(gameDao);
         UserService userService = new UserService(authDao, userDao);
-        Server server = new Server(gameService, userService, authDao);
+        Server server = new Server();
+        server.addServices(gameService, userService, authDao);
         server.run(8080);
 
         System.out.println("♕ 240 Chess Server");

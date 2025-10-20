@@ -12,14 +12,11 @@ import java.util.Map;
 
 public class Server {
     private final Javalin javalin;
-    private final GameService gameService;
-    private final UserService userService;
-    private final AuthDao authDao;
+    private GameService gameService;
+    private UserService userService;
+    private AuthDao authDao;
 
-    public Server(GameService gameService, UserService userService, AuthDao authDao) {
-        this.gameService = gameService;
-        this.userService = userService;
-        this.authDao = authDao;
+    public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
         // User Handlers
             .delete("/session", this::logout)
@@ -38,6 +35,12 @@ public class Server {
                 "error", error.getMessage()
                 ));
             });
+    }
+
+    public void addServices(GameService gameService, UserService userService, AuthDao authDao) {
+        this.gameService = gameService;
+        this.userService = userService;
+        this.authDao = authDao;
     }
 
     private void logout (Context context) throws HttpException {

@@ -1,4 +1,6 @@
 package model;
 
-public record JoinGameData(String playerColor, int gameID) {
+import chess.ChessGame.TeamColor;
+
+public record JoinGameData(TeamColor playerColor, int gameID) {
 }
