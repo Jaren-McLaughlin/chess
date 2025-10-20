@@ -18,10 +18,13 @@ public class GameService {
         // reach out to gameDao to create a game, return the gameData
         // Create a gameData record with gameID
         // response: { "gameID": 1234 }
+        if (gameData.gameName() == null) {
+            throw HttpException.badRequest("Error: no gameName provided");
+        }
         try {
             return gameDao.addGame(gameData);
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Bad Request: " + error);
+            throw HttpException.badRequest("Error: Bad Request " + error);
         }
     }
 
@@ -31,7 +34,7 @@ public class GameService {
         try {
             return gameDao.getGameList();
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Bad Request: " + error);
+            throw HttpException.badRequest("Error: Bad Request " + error);
         }
     }
 
@@ -40,11 +43,27 @@ public class GameService {
         // call gameDao to get game data
         // check which color is taken
         // throw error if color is taken else return
+        if (joinGameData.playerColor() == null) {
+            throw HttpException.badRequest("Error: playerColor not provided");
+        }
+        if (joinGameData.gameID() == 0) {
+            throw HttpException.badRequest("Error: gameId not provided");
+        }
+        try {
+            TeamColor.valueOf(joinGameData.playerColor().toString());
+        } catch (Exception error) {
+            throw HttpException.badRequest("Error: invalid color");
+        }
+
         GameData gameDetails;
         try {
             gameDetails = gameDao.getGame(joinGameData.gameID());
+            System.out.println(gameDetails);
+            if (gameDetails == null) {
+                throw HttpException.badRequest("Error: Game not found");
+            }
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Bad Request: " + error);
+            throw HttpException.badRequest("Error: Bad Request " + error);
         }
         if (
             (
@@ -55,7 +74,7 @@ public class GameService {
                 joinGameData.playerColor() == TeamColor.WHITE
             )
         ) {
-            throw HttpException.alreadyTaken("Color already taken");
+            throw HttpException.alreadyTaken("Error: Color already taken");
         }
         if (joinGameData.playerColor() == TeamColor.BLACK) {
             GameData newGameData = new GameData(
@@ -68,7 +87,7 @@ public class GameService {
             try {
                 gameDao.insertUserIntoGame(newGameData);
             } catch (DataAccessException error) {
-                throw HttpException.badRequest("Bad Request: " + error);
+                throw HttpException.badRequest("Error: Bad Request " + error);
             }
         }
         if (joinGameData.playerColor() == TeamColor.WHITE) {
@@ -82,7 +101,7 @@ public class GameService {
             try {
                 gameDao.insertUserIntoGame(newGameData);
             } catch (DataAccessException error) {
-                throw HttpException.badRequest("Bad Request: " + error);
+                throw HttpException.badRequest("Error: Bad Request " + error);
             }
         }
     }
@@ -92,7 +111,7 @@ public class GameService {
         try {
             gameDao.clearDb();
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Bad Request: " + error);
+            throw HttpException.badRequest("Error: Bad Request " + error);
         }
     }
 }

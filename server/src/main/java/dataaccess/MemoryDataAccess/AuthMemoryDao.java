@@ -8,9 +8,9 @@ import model.*;
 public class AuthMemoryDao implements AuthDao {
     private final HashMap<String, String> auth = new HashMap<>();
 
-    public AuthData addUserAuth(String username, String authToken) {
+    public AuthData addUserAuth(String authToken, String username) {
         auth.put(authToken, username);
-        return new AuthData(username, authToken);
+        return new AuthData(authToken, username);
     }
 
     public String getUserByToken(String authToken) {

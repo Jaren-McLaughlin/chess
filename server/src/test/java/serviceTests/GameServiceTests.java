@@ -3,9 +3,7 @@ package serviceTests;
 import chess.ChessGame.TeamColor;
 import dataaccess.MemoryDataAccess.GameMemoryDao;
 import exception.HttpException;
-import model.GameData;
-import model.GameListData;
-import model.JoinGameData;
+import model.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,7 @@ public class GameServiceTests {
     void createGame() throws HttpException {
         GameData request = new GameData(0, null, null, "My Test game", null);
         GameData response = gameService.createGame(request);
-        Assertions.assertEquals(0, response.gameID());
+        Assertions.assertEquals(1, response.gameID());
 
         GameListData gameDataList = gameService.getGameList();
         Assertions.assertEquals(1, gameDataList.games().size());
@@ -38,9 +36,9 @@ public class GameServiceTests {
 
         GameListData gameDataList = gameService.getGameList();
         Assertions.assertEquals(3, gameDataList.games().size());
-        Assertions.assertTrue(gameDataList.games().contains(new GameData(0, null, null, "My first game", null)));
-        Assertions.assertTrue(gameDataList.games().contains(new GameData(1, null, null, "My Second game", null)));
-        Assertions.assertTrue(gameDataList.games().contains(new GameData(2, null, null, "My Third game", null)));
+        Assertions.assertTrue(gameDataList.games().contains(new GameData(1, null, null, "My first game", null)));
+        Assertions.assertTrue(gameDataList.games().contains(new GameData(2, null, null, "My Second game", null)));
+        Assertions.assertTrue(gameDataList.games().contains(new GameData(3, null, null, "My Third game", null)));
 
     }
 

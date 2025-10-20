@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class GameMemoryDao implements GameDao {
     private final HashMap<Integer, GameData> game = new HashMap<>();
-    private int numberOfGames = 0;
+    private int numberOfGames = 1;
     public GameData addGame(GameData gameData) {
         GameData newGameData = new GameData(
                 numberOfGames,
@@ -31,6 +31,6 @@ public class GameMemoryDao implements GameDao {
     }
     public void clearDb() {
         game.clear();
-        numberOfGames = 0;
+        numberOfGames = 1;
     }
 }
