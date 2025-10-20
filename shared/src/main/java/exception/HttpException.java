@@ -15,6 +15,10 @@ public class HttpException extends Exception {
 
     public int getStatus() { return status; }
 
+    public String toJson() {
+        return new Gson().toJson(Map.of("message", getMessage(), "status", status));
+    }
+
     public static HttpException badRequest(String message) {
         return new HttpException(400, message);
     }
