@@ -29,6 +29,14 @@ public class GameServiceTests {
     }
 
     @Test
+    void noGameName() throws HttpException {
+        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->   gameService.createGame(new GameData(0, null, null, null, null
+        )));
+        Assertions.assertEquals(400, thrownError.getStatus());
+        Assertions.assertEquals("Error: no gameName provided", thrownError.getMessage());
+    }
+
+    @Test
     void getGameList() throws HttpException {
         gameService.createGame(new GameData(0, null, null, "My first game", null));
         gameService.createGame(new GameData(0, null, null, "My Second game", null));
