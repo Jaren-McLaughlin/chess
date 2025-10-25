@@ -66,7 +66,7 @@ public class AuthSQLDao implements AuthDao {
         CREATE TABLE IF NOT EXISTS auth (
           `authToken` varchar(256) NOT NULL,
           `username` varchar(256) NOT NULL,
-          PRIMARY KEY (`authToken`),
+          PRIMARY KEY (`authToken`)
         )
         """
     };

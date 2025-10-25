@@ -72,7 +72,7 @@ public class UserSQLDao implements UserDao {
           `email` varchar(256) NOT NULL,
           `password` varchar(256) NOT NULL,
           `username` varchar(256) NOT NULL,
-          PRIMARY KEY (`username`),
+          PRIMARY KEY (`username`)
         )
         """
     };
