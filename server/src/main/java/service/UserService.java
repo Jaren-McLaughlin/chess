@@ -2,9 +2,9 @@ package service;
 
 import model.*;
 import dataaccess.*;
-import java.util.Objects;
 import java.util.UUID;
 import exception.HttpException;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private final AuthDao authDao;
@@ -37,8 +37,10 @@ public class UserService {
         } catch (DataAccessException error) {
             throw HttpException.internalServerError("Error: something went wrong " + error);
         }
+        String hashPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
+        UserData withHash = new UserData(userData.username(), hashPassword, userData.email());
         try {
-            userDao.addUser(userData);
+            userDao.addUser(withHash);
             return authDao.addUserAuth(generateToken(), userData.username());
         } catch (DataAccessException error) {
             throw HttpException.badRequest("Error: Bad Request " + error);
@@ -61,7 +63,7 @@ public class UserService {
         } catch (DataAccessException error) {
             throw HttpException.unauthorized("Error: user not found");
         }
-        if (!Objects.equals(userData.password(), passwordHash)) {
+        if (!BCrypt.checkpw(userData.password(), passwordHash)) {
             throw HttpException.unauthorized("Error: Unauthorized");
         }
         try {
