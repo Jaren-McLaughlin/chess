@@ -1,5 +1,6 @@
 package dataaccess.MySQLDataAccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
@@ -10,6 +11,7 @@ import model.UserData;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GameSQLDao {
     public GameSQLDao() throws DataAccessException {
@@ -43,15 +45,63 @@ public class GameSQLDao {
     }
 
     public GameData getGame(int gameId) throws DataAccessException {
-
+        String statement = "SELECT * FROM game WHERE gameId = ?";
+        try (Connection con = DatabaseManager.getConnection()) {
+            PreparedStatement query = con.prepareStatement(statement);
+            query.setInt(1, gameId);
+            ResultSet result = query.executeQuery();
+            if (result.next()) {
+                ChessGame game = new Gson().fromJson(result.getString("game"), ChessGame.class);
+                return new GameData(
+                        gameId,
+                        result.getString("whiteUsername"),
+                        result.getString("blackUsername"),
+                        result.getString("gameName"),
+                        game
+                );
+            }
+        } catch (DataAccessException | SQLException error) {
+            throw new DataAccessException("SQL Error: " + error);
+        }
+        return null;
     }
 
     public GameListData getGameList() throws DataAccessException {
-
+        String statement = "SELECT * FROM game";
+        try (Connection con = DatabaseManager.getConnection()) {
+            Statement query = con.createStatement();
+            ResultSet result = query.executeQuery(statement);
+            List<GameData> games = new ArrayList<>();
+            while (result.next()) {
+                ChessGame game = new Gson().fromJson(result.getString("game"), ChessGame.class);
+                games.add(new GameData(
+                        result.getInt("gameId"),
+                        result.getString("whiteUsername"),
+                        result.getString("blackUsername"),
+                        result.getString("gameName"),
+                        game
+                ));
+            }
+        } catch (DataAccessException | SQLException error) {
+            throw new DataAccessException("SQL Error: " + error);
+        }
+        return null;
     }
 
     public void insertUserIntoGame(GameData newData) throws DataAccessException {
-
+        String statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameId = ?";
+        String jsonGame = new Gson().toJson(newData.game());
+        try (Connection con = DatabaseManager.getConnection()) {
+            PreparedStatement query = con.prepareStatement(statement);
+            query.setString(1, newData.whiteUsername());
+            query.setString(2, newData.blackUsername());
+            query.setString(3, newData.gameName());
+            query.setString(4, jsonGame);
+            query.setInt(5, newData.gameID());
+            query.executeUpdate();
+        } catch (DataAccessException | SQLException error) {
+            throw new DataAccessException("SQL Error: " + error);
+        }
     }
 
     public void clearDb() throws DataAccessException {
