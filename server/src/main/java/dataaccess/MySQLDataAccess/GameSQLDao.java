@@ -21,7 +21,7 @@ public class GameSQLDao implements GameDao {
         String statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         String jsonGame = new Gson().toJson(gameData.game());
         try (Connection con = DatabaseManager.getConnection()) {
-            PreparedStatement query = con.prepareStatement(statement);
+            PreparedStatement query = con.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
             query.setString(1, gameData.whiteUsername());
             query.setString(2, gameData.blackUsername());
             query.setString(3, gameData.gameName());
@@ -30,7 +30,7 @@ public class GameSQLDao implements GameDao {
             ResultSet result = query.getGeneratedKeys();
             if (result.next()) {
                 return new GameData(
-                    result.getInt("gameId"),
+                    result.getInt(1),
                     gameData.whiteUsername(),
                     gameData.blackUsername(),
                     gameData.gameName(),
@@ -81,10 +81,10 @@ public class GameSQLDao implements GameDao {
                         game
                 ));
             }
+            return new GameListData(games);
         } catch (DataAccessException | SQLException error) {
             throw new DataAccessException("SQL Error: " + error);
         }
-        return null;
     }
 
     public void insertUserIntoGame(GameData newData) throws DataAccessException {
@@ -116,8 +116,8 @@ public class GameSQLDao implements GameDao {
         """
         CREATE TABLE IF NOT EXISTS game (
           `gameId` int NOT NULL AUTO_INCREMENT,
-          `whiteUsername` varchar(256) NOT NULL,
-          `blackUsername` varchar(256) NOT NULL,
+          `whiteUsername` varchar(256),
+          `blackUsername` varchar(256),
           `gameName` varchar(256) NOT NULL,
           `game` JSON,
           PRIMARY KEY (`gameId`)

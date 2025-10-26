@@ -25,15 +25,15 @@ public class Server {
     private AuthDao authDao;
 
     public Server() {
-        this.authDao = new AuthMemoryDao();
-        GameDao gameDao = new GameMemoryDao();
-        UserDao userDao = new UserMemoryDao();
+//        this.authDao = new AuthMemoryDao();
+        GameDao gameDao = null;// new GameMemoryDao();
+        UserDao userDao = null;// new UserMemoryDao();
         try {
             this.authDao = new AuthSQLDao();
             gameDao = new GameSQLDao();
             userDao = new UserSQLDao();
         } catch (DataAccessException error) {
-            System.out.println("Unfortunate problem occurred");
+            System.out.println("Unfortunate problem occurred " + error);
         }
         this.gameService = new GameService(gameDao);
         this.userService = new UserService(authDao, userDao);

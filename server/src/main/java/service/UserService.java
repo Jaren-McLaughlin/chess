@@ -43,7 +43,7 @@ public class UserService {
             userDao.addUser(withHash);
             return authDao.addUserAuth(generateToken(), userData.username());
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Error: Bad Request " + error);
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
         }
     }
 
@@ -61,7 +61,7 @@ public class UserService {
                 throw HttpException.unauthorized("Error: user not found");
             }
         } catch (DataAccessException error) {
-            throw HttpException.unauthorized("Error: user not found");
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
         }
         if (!BCrypt.checkpw(userData.password(), passwordHash)) {
             throw HttpException.unauthorized("Error: Unauthorized");
@@ -69,7 +69,7 @@ public class UserService {
         try {
             return authDao.addUserAuth(generateToken(), userData.username());
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Error: Bad Request " + error);
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
         }
     }
 
@@ -88,7 +88,7 @@ public class UserService {
         try{
             authDao.deleteUserAuth(authToken);
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Error: Bad Request " + error);
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
         }
     }
 
@@ -108,7 +108,7 @@ public class UserService {
             authDao.clearDb();
             userDao.clearDb();
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Error: Bad Request " + error);
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
         }
     }
 }

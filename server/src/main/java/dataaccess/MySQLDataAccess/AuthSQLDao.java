@@ -61,9 +61,9 @@ public class AuthSQLDao implements AuthDao {
     }
 
     private final String[] authTableSql = {
-            """
+        """
         CREATE TABLE IF NOT EXISTS auth (
-          `authToken` varchar(256) NOT NULL,
+          `authToken` varchar(256),
           `username` varchar(256) NOT NULL,
           PRIMARY KEY (`authToken`)
         )

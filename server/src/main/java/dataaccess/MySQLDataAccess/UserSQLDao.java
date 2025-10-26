@@ -68,8 +68,8 @@ public class UserSQLDao implements UserDao {
 
     private final String[] userTableSql = {
         """
-        CREATE TABLE IF NOT EXISTS  user (
-          `email` varchar(256) NOT NULL,
+        CREATE TABLE IF NOT EXISTS  `user` (
+          `email` varchar(256),
           `password` varchar(256) NOT NULL,
           `username` varchar(256) NOT NULL,
           PRIMARY KEY (`username`)

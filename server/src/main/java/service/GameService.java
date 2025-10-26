@@ -17,7 +17,7 @@ public class GameService {
         try {
             return gameDao.addGame(gameData);
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Error: Bad Request " + error);
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
         }
     }
 
@@ -25,7 +25,7 @@ public class GameService {
         try {
             return gameDao.getGameList();
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Error: Bad Request " + error);
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
         }
     }
 
@@ -49,7 +49,7 @@ public class GameService {
                 throw HttpException.badRequest("Error: Game not found");
             }
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Error: Bad Request " + error);
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
         }
         if (
             (
@@ -73,7 +73,7 @@ public class GameService {
             try {
                 gameDao.insertUserIntoGame(newGameData);
             } catch (DataAccessException error) {
-                throw HttpException.badRequest("Error: Bad Request " + error);
+                throw HttpException.internalServerError("Error: Internal Server Error " + error);
             }
         }
         if (joinGameData.playerColor() == TeamColor.WHITE) {
@@ -87,7 +87,7 @@ public class GameService {
             try {
                 gameDao.insertUserIntoGame(newGameData);
             } catch (DataAccessException error) {
-                throw HttpException.badRequest("Error: Bad Request " + error);
+                throw HttpException.internalServerError("Error: Internal Server Error " + error);
             }
         }
     }
@@ -96,7 +96,7 @@ public class GameService {
         try {
             gameDao.clearDb();
         } catch (DataAccessException error) {
-            throw HttpException.badRequest("Error: Bad Request " + error);
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
         }
     }
 }
