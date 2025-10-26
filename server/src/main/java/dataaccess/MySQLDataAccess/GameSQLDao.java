@@ -4,10 +4,8 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
-import model.AuthData;
 import model.GameData;
 import model.GameListData;
-import model.UserData;
 
 import java.sql.*;
 import java.util.ArrayList;
