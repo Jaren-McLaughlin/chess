@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 import dataaccess.AuthDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
+import dataaccess.MySQLDataAccess.AuthSQLDao;
+import dataaccess.MySQLDataAccess.GameSQLDao;
+import dataaccess.MySQLDataAccess.UserSQLDao;
 import dataaccess.memorydataaccess.AuthMemoryDao;
 import dataaccess.memorydataaccess.GameMemoryDao;
 import dataaccess.memorydataaccess.UserMemoryDao;
@@ -19,12 +22,19 @@ public class Server {
     private final Javalin javalin;
     private final GameService gameService;
     private final UserService userService;
-    private final AuthDao authDao;
+    private AuthDao authDao;
 
     public Server() {
         this.authDao = new AuthMemoryDao();
         GameDao gameDao = new GameMemoryDao();
         UserDao userDao = new UserMemoryDao();
+        try {
+            this.authDao = new AuthSQLDao();
+            gameDao = new GameSQLDao();
+            userDao = new UserSQLDao();
+        } catch (DataAccessException error) {
+            System.out.println("Unfortunate problem occurred");
+        }
         this.gameService = new GameService(gameDao);
         this.userService = new UserService(authDao, userDao);
         javalin = Javalin.create(config -> config.staticFiles.add("web"))

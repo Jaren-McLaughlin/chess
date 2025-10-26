@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
+import dataaccess.GameDao;
 import model.GameData;
 import model.GameListData;
 
@@ -11,7 +12,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameSQLDao {
+public class GameSQLDao implements GameDao {
     public GameSQLDao() throws DataAccessException {
         createTable();
     }
