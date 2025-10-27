@@ -25,9 +25,9 @@ public class Server {
     private AuthDao authDao;
 
     public Server() {
-//        this.authDao = new AuthMemoryDao();
-        GameDao gameDao = null;// new GameMemoryDao();
-        UserDao userDao = null;// new UserMemoryDao();
+        this.authDao = new AuthMemoryDao();
+        GameDao gameDao = new GameMemoryDao();
+        UserDao userDao = new UserMemoryDao();
         try {
             this.authDao = new AuthSQLDao();
             gameDao = new GameSQLDao();
