@@ -1,7 +1,7 @@
 package dataaccess;
 
-import dataaccess.MySQLDataAccess.AuthSQLDao;
-import dataaccess.MySQLDataAccess.UserSQLDao;
+import dataaccess.mysqlataaccess.AuthSQLDao;
+import dataaccess.mysqlataaccess.UserSQLDao;
 import model.UserData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -52,7 +52,9 @@ public class UserTest {
     @Test
     void cannotAddDuplicateUser() throws DataAccessException {
         userDao.addUser(new UserData("testUsername", "testPassword", "testEmail"));
-        DataAccessException thrownError = Assertions.assertThrows(DataAccessException.class, () ->  userDao.addUser(new UserData("testUsername", "testPassword", "testEmail")));
+        DataAccessException thrownError = Assertions.assertThrows(
+            DataAccessException.class, () ->  userDao.addUser(new UserData("testUsername", "testPassword", "testEmail"))
+        );
         Assertions.assertTrue(thrownError.getMessage().contains("Duplicate entry"),
                 "Error message should mention duplicate entry");
     }
