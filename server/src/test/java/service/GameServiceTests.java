@@ -50,6 +50,12 @@ public class GameServiceTests {
     }
 
     @Test
+    void returnNull() throws HttpException {
+        GameListData gameDataList = gameService.getGameList();
+        Assertions.assertTrue(gameDataList.games().isEmpty(), "Should return nothing");
+    }
+
+    @Test
     void joinGame() throws HttpException {
         GameData request = new GameData(0, null, null, "My Test game", null);
         GameData response = gameService.createGame(request);
