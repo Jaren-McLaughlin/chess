@@ -1,7 +1,7 @@
 package dataaccess;
 
-import dataaccess.MySQLDataAccess.AuthSQLDao;
-import dataaccess.MySQLDataAccess.GameSQLDao;
+import dataaccess.mysqlataaccess.AuthSQLDao;
+import dataaccess.mysqlataaccess.GameSQLDao;
 import model.GameData;
 import model.GameListData;
 import org.junit.jupiter.api.AfterEach;
@@ -190,21 +190,21 @@ public class GameTest {
     void clearDb() throws DataAccessException {
         gameDao.addGame(new GameData(
                 0,
-                "test",
+                "clearTest",
                 "test2",
                 "myGame",
                 null
         ));
         gameDao.addGame(new GameData(
                 0,
-                "test",
+                "clearTest",
                 "test2",
                 "myGame",
                 null
         ));
         gameDao.addGame(new GameData(
                 0,
-                "test",
+                "clearTest",
                 "test2",
                 "myGame",
                 null

@@ -1,4 +1,4 @@
-package dataaccess.MySQLDataAccess;
+package dataaccess.mysqlataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class GameSQLDao implements GameDao {
     public GameSQLDao() throws DataAccessException {
-        createTable();
+        DatabaseManager.createTable(gameTableSql);
     }
 
     public GameData addGame(GameData gameData) throws DataAccessException {
@@ -124,17 +124,4 @@ public class GameSQLDao implements GameDao {
         )
         """
     };
-
-    private void createTable() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection con = DatabaseManager.getConnection()) {
-            for (String statement : gameTableSql) {
-                try (var preparedStatement = con.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (DataAccessException | SQLException error) {
-            throw new DataAccessException("SQL Error: " + error);
-        }
-    }
 }

@@ -1,4 +1,4 @@
-package dataaccess.MySQLDataAccess;
+package dataaccess.mysqlataaccess;
 
 import dataaccess.AuthDao;
 import dataaccess.DataAccessException;
@@ -9,7 +9,7 @@ import java.sql.*;
 
 public class AuthSQLDao implements AuthDao {
     public AuthSQLDao() throws DataAccessException {
-        createTable();
+        DatabaseManager.createTable(authTableSql);
     }
 
     public AuthData addUserAuth(String authToken, String username) throws DataAccessException {
@@ -69,17 +69,4 @@ public class AuthSQLDao implements AuthDao {
         )
         """
     };
-
-    private void createTable() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection con = DatabaseManager.getConnection()) {
-            for (String statement : authTableSql) {
-                try (var preparedStatement = con.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (DataAccessException | SQLException error) {
-            throw new DataAccessException("SQL Error: " + error);
-        }
-    }
 }

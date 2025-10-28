@@ -1,4 +1,4 @@
-package dataaccess.MySQLDataAccess;
+package dataaccess.mysqlataaccess;
 
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
@@ -9,7 +9,7 @@ import java.sql.*;
 
 public class UserSQLDao implements UserDao {
     public UserSQLDao() throws DataAccessException {
-        createTable();
+        DatabaseManager.createTable(userTableSql);
     }
 
     public void addUser(UserData userData) throws DataAccessException {
@@ -76,17 +76,4 @@ public class UserSQLDao implements UserDao {
         )
         """
     };
-
-    private void createTable() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection con = DatabaseManager.getConnection()) {
-            for (String statement : userTableSql) {
-                try (var preparedStatement = con.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (DataAccessException | SQLException error) {
-            throw new DataAccessException("SQL Error: " + error);
-        }
-    }
 }

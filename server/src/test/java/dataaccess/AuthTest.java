@@ -1,6 +1,6 @@
 package dataaccess;
 
-import dataaccess.MySQLDataAccess.AuthSQLDao;
+import dataaccess.mysqlataaccess.AuthSQLDao;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -65,17 +65,8 @@ public class AuthTest {
     void deleteUserAuth() throws DataAccessException {
         authDao.addUserAuth("test", "testUser");
         authDao.deleteUserAuth("test");
-        String statement = "SELECT * FROM auth";
-        try (Connection con = DatabaseManager.getConnection()) {
-            Statement query = con.createStatement();
-            ResultSet result = query.executeQuery(statement);
-            if (result.next()) {
-                Assertions.assertNull(result.getString("authToken"));
-                Assertions.assertNull(result.getString("username"));
-            }
-        } catch (DataAccessException | SQLException error) {
-            throw new DataAccessException("SQL Error: " + error);
-        }
+
+        checkForNoAuth();
     }
     @Test
     void doesNotErrorOnNonExistentToken() throws DataAccessException {
@@ -88,15 +79,15 @@ public class AuthTest {
         authDao.addUserAuth("test2", "testUser");
 
         authDao.clearDb();
+        checkForNoAuth();
+    }
 
+    private void checkForNoAuth() throws DataAccessException {
         String statement = "SELECT * FROM auth";
         try (Connection con = DatabaseManager.getConnection()) {
             Statement query = con.createStatement();
             ResultSet result = query.executeQuery(statement);
-            if (result.next()) {
-                Assertions.assertNull(result.getString("authToken"));
-                Assertions.assertNull(result.getString("username"));
-            }
+            Assertions.assertFalse(result.next());
         } catch (DataAccessException | SQLException error) {
             throw new DataAccessException("SQL Error: " + error);
         }
