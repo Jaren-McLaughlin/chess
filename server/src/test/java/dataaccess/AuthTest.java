@@ -1,14 +1,11 @@
 package dataaccess;
 
 import dataaccess.MySQLDataAccess.AuthSQLDao;
-import exception.HttpException;
-import model.GameData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
 
 public class AuthTest {
@@ -81,7 +78,7 @@ public class AuthTest {
         }
     }
     @Test
-    void someNegativeDeleteAuth() throws DataAccessException {
+    void doesNotErrorOnNonExistentToken() throws DataAccessException {
         Assertions.assertDoesNotThrow(() -> authDao.deleteUserAuth("test"));
     }
     @Test

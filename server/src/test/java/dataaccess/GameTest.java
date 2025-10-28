@@ -1,7 +1,9 @@
 package dataaccess;
 
+import dataaccess.MySQLDataAccess.AuthSQLDao;
 import dataaccess.MySQLDataAccess.GameSQLDao;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class GameTest {
@@ -14,6 +16,11 @@ public class GameTest {
         }
     }
 
+    @BeforeAll
+    static void beforeClear() throws DataAccessException {
+        AuthDao authDao = new AuthSQLDao();
+        authDao.clearDb();
+    }
     @AfterEach
     void clear() throws DataAccessException {
         gameDao.clearDb();

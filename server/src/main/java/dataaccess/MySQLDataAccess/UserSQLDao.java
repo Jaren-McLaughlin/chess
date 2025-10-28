@@ -46,9 +46,9 @@ public class UserSQLDao implements UserDao {
             ResultSet result = query.executeQuery();
             if (result.next()) {
                 return new UserData(
-                    result.getString("email"),
+                    result.getString("username"),
                     result.getString("password"),
-                    result.getString("username")
+                    result.getString("email")
                 );
             }
         } catch (DataAccessException | SQLException error) {
