@@ -1,7 +1,9 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -109,56 +111,27 @@ public class ChessBoardUi {
         }
     }
 
-    public void drawFromWhite() {
-        // Arrange text in order for the perspective of white
-        // Should be the normal way that the board looks
-        //Temp
-        // Piece array
-        ChessPiece.PieceType[] pieces = {
-                ChessPiece.PieceType.ROOK,
-                ChessPiece.PieceType.KNIGHT,
-                ChessPiece.PieceType.BISHOP,
-                ChessPiece.PieceType.QUEEN,
-                ChessPiece.PieceType.KING,
-                ChessPiece.PieceType.BISHOP,
-                ChessPiece.PieceType.KNIGHT,
-                ChessPiece.PieceType.ROOK
-        };
-        //Reset board
+
+
+    public void drawFromWhite(ChessBoard chessBoard) {
         ChessPiece[][] gameBoard = new ChessPiece[8][8];
 
         for (int i = 0; i < 8; i++) {
-            gameBoard[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, pieces[i]);
-            gameBoard[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            gameBoard[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            gameBoard[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, pieces[i]);
+            for (int k = 0; k < 8; k++) {
+                gameBoard[i][k] = chessBoard.getPiece(new ChessPosition(i + 1, k + 1));
+            }
         }
 
         drawChessBoard(gameBoard, col, row);
     }
 
-    public void drawFromBlack() {
-        // Arrange text in order of black perspective
-        // Just start in the top right 7,7 of a game board and read backwards
-        //
-        ChessPiece.PieceType[] pieces = {
-                ChessPiece.PieceType.ROOK,
-                ChessPiece.PieceType.KNIGHT,
-                ChessPiece.PieceType.BISHOP,
-                ChessPiece.PieceType.KING,
-                ChessPiece.PieceType.QUEEN,
-                ChessPiece.PieceType.BISHOP,
-                ChessPiece.PieceType.KNIGHT,
-                ChessPiece.PieceType.ROOK
-        };
-        //Reset board
+    public void drawFromBlack(ChessBoard chessBoard) {
         ChessPiece[][] gameBoard = new ChessPiece[8][8];
 
         for (int i = 0; i < 8; i++) {
-            gameBoard[7][i] = new ChessPiece(ChessGame.TeamColor.WHITE, pieces[i]);
-            gameBoard[6][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            gameBoard[1][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            gameBoard[0][i] = new ChessPiece(ChessGame.TeamColor.BLACK, pieces[i]);
+            for (int k = 0; k < 8; k++) {
+                gameBoard[i][k] = chessBoard.getPiece(new ChessPosition( 8 - i, 8 - k));
+            }
         }
 
         drawChessBoard(gameBoard, colBackwards, rowBackwards);
