@@ -7,6 +7,7 @@ import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import static ui.EscapeSequences.*;
 
@@ -70,12 +71,12 @@ public class ChessBoardUi {
         };
     }
 
-    private String getColorFromEnum(ChessGame.TeamColor pieceType) {
-        return switch(pieceType) {
-            case ChessGame.TeamColor.WHITE -> TXT_BLACK;
-            case ChessGame.TeamColor.BLACK -> TXT_WHITE;
-        };
-    }
+        private String getColorFromEnum(ChessGame.TeamColor pieceType) {
+            return switch(pieceType) {
+                case ChessGame.TeamColor.WHITE -> TXT_WHITE;
+                case ChessGame.TeamColor.BLACK -> TXT_BLACK;
+            };
+        }
 
     private void startLightRow(PrintStream out, ChessPiece[] chessPiece) {
         for (int i = 0; i < 8; i++) {
@@ -111,17 +112,16 @@ public class ChessBoardUi {
         }
     }
 
-
-
     public void drawFromWhite(ChessBoard chessBoard) {
         ChessPiece[][] gameBoard = new ChessPiece[8][8];
 
         for (int i = 0; i < 8; i++) {
             for (int k = 0; k < 8; k++) {
-                gameBoard[i][k] = chessBoard.getPiece(new ChessPosition(i + 1, k + 1));
+                gameBoard[i][k] = chessBoard.getPiece(new ChessPosition( 8 - i, 8 - k));
             }
         }
-
+        System.out.println(chessBoard.toString());
+        System.out.println(Arrays.deepToString(gameBoard));
         drawChessBoard(gameBoard, col, row);
     }
 
@@ -130,7 +130,7 @@ public class ChessBoardUi {
 
         for (int i = 0; i < 8; i++) {
             for (int k = 0; k < 8; k++) {
-                gameBoard[i][k] = chessBoard.getPiece(new ChessPosition( 8 - i, 8 - k));
+                gameBoard[i][k] = chessBoard.getPiece(new ChessPosition(i + 1, k + 1));
             }
         }
 
