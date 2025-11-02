@@ -7,7 +7,6 @@ import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 import static ui.EscapeSequences.*;
 
@@ -20,7 +19,9 @@ public class ChessBoardUi {
     public void drawChessBoard(ChessPiece[][] chessGame, char[] col, char[] row) {
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
-        out.print(ERASE_SCREEN);
+//        out.print(ERASE_SCREEN);
+        out.print("\033[H\033[2J");
+        out.flush();
 
         String colString = ("    " + col[0] + " \u2003" + col[1] + " \u2003" + col[2] + " \u2003" + col[3] + " \u2003" + col[4] + " \u2003" + col[5] + " \u2003" + col[6] + " \u2003" + col[7] + "    " + NEW_LINE);
         boarder(out, colString);
@@ -71,12 +72,12 @@ public class ChessBoardUi {
         };
     }
 
-        private String getColorFromEnum(ChessGame.TeamColor pieceType) {
-            return switch(pieceType) {
-                case ChessGame.TeamColor.WHITE -> TXT_WHITE;
-                case ChessGame.TeamColor.BLACK -> TXT_BLACK;
-            };
-        }
+    private String getColorFromEnum(ChessGame.TeamColor pieceType) {
+        return switch(pieceType) {
+            case ChessGame.TeamColor.WHITE -> TXT_WHITE;
+            case ChessGame.TeamColor.BLACK -> TXT_BLACK;
+        };
+    }
 
     private void startLightRow(PrintStream out, ChessPiece[] chessPiece) {
         for (int i = 0; i < 8; i++) {
@@ -120,8 +121,7 @@ public class ChessBoardUi {
                 gameBoard[i][k] = chessBoard.getPiece(new ChessPosition( 8 - i, k + 1));
             }
         }
-        System.out.println(chessBoard.toString());
-        System.out.println(Arrays.deepToString(gameBoard));
+
         drawChessBoard(gameBoard, col, row);
     }
 

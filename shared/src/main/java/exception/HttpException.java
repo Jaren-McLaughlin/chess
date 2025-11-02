@@ -31,5 +31,15 @@ public class HttpException extends Exception {
     public static HttpException internalServerError(String message) {
         return new HttpException(500, message);
     }
+
+    public static HttpException fromJson(String json) {
+        var map = new Gson().fromJson(json, HashMap.class);
+        var status = ((Number) map.get("status")).intValue();
+        String message = map.get("message").toString();
+        return new HttpException(status, message);
+    }
+    public static HttpException rawError(int status,String message) {
+        return new HttpException(status, message);
+    }
 }
 // throw new HttpException(400, "Username required");
