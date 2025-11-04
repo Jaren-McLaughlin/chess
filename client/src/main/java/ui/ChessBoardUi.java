@@ -19,8 +19,7 @@ public class ChessBoardUi {
     public void drawChessBoard(ChessPiece[][] chessGame, char[] col, char[] row) {
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
-//        out.print(ERASE_SCREEN);
-        out.print("\033[H\033[2J");
+        out.print(ERASE_SCREEN);
         out.flush();
 
         String colString = ("    " + col[0] + " \u2003" + col[1] + " \u2003" + col[2] + " \u2003" + col[3] + " \u2003" + col[4] + " \u2003" + col[5] + " \u2003" + col[6] + " \u2003" + col[7] + "    " + NEW_LINE);

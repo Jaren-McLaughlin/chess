@@ -1,0 +1,47 @@
+package ui;
+
+import server.ServerFacade;
+
+import java.util.Arrays;
+
+public class PreLogin implements CommandHandler {
+    public String executeCommand(Session session, ServerFacade serverFacade, String input) {
+        String[] values = input.toLowerCase().split(" ");
+        String command = (values.length > 0) ? values[0] : "help";
+        String[] parameters = Arrays.copyOfRange(values, 1, values.length);
+        return switch (command) {
+            case "help" -> help();
+            case "login" -> login(session, serverFacade, parameters);
+            case "quit" -> quit();
+            case "register" -> register(session, serverFacade, parameters);
+            default -> unknownCommand(command);
+        };
+    }
+
+    private String help() {
+        String helpPrompt = """
+            Commands:
+            help - Shows available commands
+            login <Username> <Password> - Log into your account
+            quit - End your connection
+            register <Username> <Password> <Email> - Create an account
+        """;
+        System.out.println(helpPrompt);
+        return null;
+    }
+    private String login(Session session, ServerFacade serverFacade, String[] input) {
+
+        return null;
+    }
+    private String quit() {
+        return "quit";
+    }
+    private String register(Session session, ServerFacade serverFacade, String[] input) {
+
+        return null;
+    }
+    private String unknownCommand(String input) {
+        System.out.println("Unknown Command: " + input + "\nType \"help\" for a list of commands");
+        return null;
+    }
+}
