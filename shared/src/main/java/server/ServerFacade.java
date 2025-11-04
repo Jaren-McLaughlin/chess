@@ -26,7 +26,7 @@ public class ServerFacade {
     public GameListData getGameList(String authToken) throws HttpException {
         HttpRequest request = httpRequest("GET", "/game", null, authToken);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, null);
+        return handleResponse(response, GameListData.class);
     }
 
     public void joinGame(JoinGameData joinGameData, String authToken) throws HttpException {
@@ -37,15 +37,18 @@ public class ServerFacade {
 
     // User
     public AuthData createUser (UserData userData) throws HttpException {
+        System.out.println(userData);
         HttpRequest request = httpRequest("POST", "/user", userData, null);
+        System.out.println(request);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, null);
+        return handleResponse(response, AuthData.class);
     }
 
     public AuthData login (UserData userData) throws HttpException {
         HttpRequest request = httpRequest("POST", "/session", userData, null);
         HttpResponse<String> response = sendRequest(request);
-        return handleResponse(response, null);
+        System.out.println(response);
+        return handleResponse(response, AuthData.class);
     }
 
     public void logout (String authToken) throws HttpException {
@@ -85,6 +88,7 @@ public class ServerFacade {
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception error) {
+            error.printStackTrace();
             throw HttpException.internalServerError(error.getMessage());
         }
     }

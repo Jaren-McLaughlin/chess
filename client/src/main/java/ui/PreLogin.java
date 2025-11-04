@@ -1,5 +1,8 @@
 package ui;
 
+import exception.HttpException;
+import model.AuthData;
+import model.UserData;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -37,8 +40,16 @@ public class PreLogin implements CommandHandler {
         return "quit";
     }
     private String register(Session session, ServerFacade serverFacade, String[] input) {
-
-        return null;
+        AuthData response;
+        try {
+            response = serverFacade.createUser(new UserData(input[0], input[1], input[2]));
+        } catch (HttpException error) {
+            System.out.println(error.getStatus() + ": " + error.getMessage());
+            return null;
+        }
+        session.setAuthToken(response.authToken());
+        session.setCommandHandler(new PostLogin());
+        return "Success";
     }
     private String unknownCommand(String input) {
         System.out.println("Unknown Command: " + input + "\nType \"help\" for a list of commands");
