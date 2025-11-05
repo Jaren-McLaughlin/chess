@@ -1,9 +1,12 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import exception.HttpException;
 import model.AuthData;
 import model.GameData;
 import model.GameListData;
+import model.JoinGameData;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -18,8 +21,8 @@ public class PostLogin implements CommandHandler {
             case "help" -> help();
             case "listgames" -> listGames(session, serverFacade);
             case "logout" -> logout(session, serverFacade);
-//            case "observegame" -> observevGame(session, serverFacade, parameters);
-//            case "playgame" -> playGame(session, serverFacade, parameters);
+            case "observegame" -> observeGame(session, serverFacade, parameters);
+            case "playgame" -> playGame(session, serverFacade, parameters);
             default -> unknownCommand(command);
         };
     }
@@ -40,12 +43,12 @@ public class PostLogin implements CommandHandler {
     private String help() {
         String helpPrompt = """
             Logged In Commands:
-            createGame - End your connection
+            createGame <Game Name> - End your connection
             help - Shows available commands
             listGames - See all games
             logout - Logout of your account
-            observeGame - Watch a game
-            playGame - Join a game
+            observeGame <gameId> - Watch a game
+            playGame <Team Color [WHITE|BLACK]> <gameId> - Join a game
         """;
         System.out.println(helpPrompt);
         return null;
@@ -72,12 +75,51 @@ public class PostLogin implements CommandHandler {
         session.setAuthToken(null);
         return "Success";
     }
-//    private String observevGame() {
-//
-//    }
-//    private String playGame() {
-//
-//    }
+    private String observeGame(Session session, ServerFacade serverFacade, String[] input) {
+        int gameId = Integer.parseInt(input[0]);
+        session.setCommandHandler(new GamePlay());
+        session.setGameId(gameId);
+        GameData gameData;
+        try {
+            gameData = serverFacade.getGameDetails(gameId, session.getAuthToken());
+        } catch (HttpException error) {
+            System.out.println(error.getStatus() + ": " + error.getMessage());
+            return null;
+        }
+        ChessBoard chessBoard = gameData.game().getBoard();
+        ChessBoardUi.drawFromWhite(chessBoard);
+        return "Success";
+    }
+    private String playGame(Session session, ServerFacade serverFacade, String[] input) {
+        int gameId;
+        ChessGame.TeamColor teamColor;
+        String authToken = session.getAuthToken();
+        try {
+            teamColor = ChessGame.TeamColor.valueOf(input[0].toUpperCase());
+            gameId = Integer.parseInt(input[1]);
+            serverFacade.joinGame(new JoinGameData(teamColor, gameId), authToken);
+        } catch (HttpException error) {
+            System.out.println(error.getStatus() + ": " + error.getMessage());
+            return null;
+        }
+        session.setCommandHandler(new GamePlay());
+        session.setGameId(gameId);
+        GameData gameData;
+        try {
+            gameData = serverFacade.getGameDetails(gameId, authToken);
+        } catch (HttpException error) {
+            System.out.println(error.getStatus() + ": " + error.getMessage());
+            return null;
+        }
+        System.out.println(gameData.toString());
+        ChessBoard chessBoard = gameData.game().getBoard();
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            ChessBoardUi.drawFromWhite(chessBoard);
+        } else {
+            ChessBoardUi.drawFromBlack(chessBoard);
+        }
+        return "Success";
+    }
     private String unknownCommand(String input) {
         System.out.println("Unknown Command: " + input + "\nType \"help\" for a list of logged in commands");
         return null;

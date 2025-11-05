@@ -19,7 +19,7 @@ public class GameSQLDao implements GameDao {
 
     public GameData addGame(GameData gameData) throws DataAccessException {
         String statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-        String jsonGame = new Gson().toJson(gameData.game());
+        String jsonGame = new Gson().toJson(new ChessGame());
         try (Connection con = DatabaseManager.getConnection()) {
             PreparedStatement query = con.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
             query.setString(1, gameData.whiteUsername());

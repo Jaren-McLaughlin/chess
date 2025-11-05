@@ -23,6 +23,12 @@ public class ServerFacade {
         return handleResponse(response, GameData.class);
     }
 
+    public GameData getGameDetails(int gameId, String authToken) throws HttpException {
+        HttpRequest request = httpRequest("GET", "/game/" + gameId, null, authToken);
+        HttpResponse<String> response = sendRequest(request);
+        return handleResponse(response, GameData.class);
+    }
+
     public GameListData getGameList(String authToken) throws HttpException {
         HttpRequest request = httpRequest("GET", "/game", null, authToken);
         HttpResponse<String> response = sendRequest(request);

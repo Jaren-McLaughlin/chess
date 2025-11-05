@@ -10,13 +10,13 @@ import java.nio.charset.StandardCharsets;
 
 import static ui.EscapeSequences.*;
 
-public class ChessBoardUi {
+public final class ChessBoardUi {
     private static final char[] col = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
     private static final char[] colBackwards = {'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'};
     private static final char[] row = {'8', '7', '6', '5', '4', '3', '2', '1'};
     private static final char[] rowBackwards = {'1', '2', '3', '4', '5', '6', '7', '8'};
 
-    public void drawChessBoard(ChessPiece[][] chessGame, char[] col, char[] row) {
+    public static void drawChessBoard(ChessPiece[][] chessGame, char[] col, char[] row) {
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -39,25 +39,25 @@ public class ChessBoardUi {
         boarder(out, colString);
     }
 
-    private void boarder(PrintStream out, String text) {
+    private static void boarder(PrintStream out, String text) {
         out.print(BG_DARK_BROWN);
         out.print(TXT_GOLD);
         out.print(text);
     }
 
-    private void lightSquare(PrintStream out, String text, String pieceColor) {
+    private static void lightSquare(PrintStream out, String text, String pieceColor) {
         out.print(BG_LIGHT_BROWN);
         out.print(pieceColor);
         out.print(text);
     }
 
-    private void darkSquare(PrintStream out, String text, String pieceColor) {
+    private static void darkSquare(PrintStream out, String text, String pieceColor) {
         out.print(BG_MEDIUM_BROWN);
         out.print(pieceColor);
         out.print(text);
     }
 
-    private String getTextFromEnum(ChessPiece.PieceType pieceType) {
+    private static String getTextFromEnum(ChessPiece.PieceType pieceType) {
         if (pieceType == null) {
             return EMPTY;
         }
@@ -71,14 +71,14 @@ public class ChessBoardUi {
         };
     }
 
-    private String getColorFromEnum(ChessGame.TeamColor pieceType) {
+    private static String getColorFromEnum(ChessGame.TeamColor pieceType) {
         return switch(pieceType) {
             case ChessGame.TeamColor.WHITE -> TXT_WHITE;
             case ChessGame.TeamColor.BLACK -> TXT_BLACK;
         };
     }
 
-    private void startLightRow(PrintStream out, ChessPiece[] chessPiece) {
+    private static void startLightRow(PrintStream out, ChessPiece[] chessPiece) {
         for (int i = 0; i < 8; i++) {
             ChessPiece piece = chessPiece[i];
             String text = EMPTY;
@@ -95,7 +95,7 @@ public class ChessBoardUi {
         }
     }
 
-    private void startDarkRow(PrintStream out, ChessPiece[] chessPiece) {
+    private static void startDarkRow(PrintStream out, ChessPiece[] chessPiece) {
         for (int i = 0; i < 8; i++) {
             ChessPiece piece = chessPiece[i];
             String text = EMPTY;
@@ -112,7 +112,7 @@ public class ChessBoardUi {
         }
     }
 
-    public void drawFromWhite(ChessBoard chessBoard) {
+    public static void drawFromWhite(ChessBoard chessBoard) {
         ChessPiece[][] gameBoard = new ChessPiece[8][8];
 
         for (int i = 0; i < 8; i++) {
@@ -124,7 +124,7 @@ public class ChessBoardUi {
         drawChessBoard(gameBoard, col, row);
     }
 
-    public void drawFromBlack(ChessBoard chessBoard) {
+    public static void drawFromBlack(ChessBoard chessBoard) {
         ChessPiece[][] gameBoard = new ChessPiece[8][8];
 
         for (int i = 0; i < 8; i++) {
