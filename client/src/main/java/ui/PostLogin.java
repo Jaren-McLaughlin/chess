@@ -1,5 +1,8 @@
 package ui;
 
+import exception.HttpException;
+import model.AuthData;
+import model.GameData;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -10,18 +13,32 @@ public class PostLogin implements CommandHandler {
         String command = (values.length > 0) ? values[0] : "help";
         String[] parameters = Arrays.copyOfRange(values, 1, values.length);
         return switch (command) {
-//            case "createGame" -> quit();
+            case "creategame" -> createGame(session, serverFacade, parameters);
             case "help" -> help();
-//            case "listGames" -> register(session, serverFacade, parameters);
-//            case "logout" -> login(session, serverFacade, parameters);
-//            case "observeGame" -> quit();
-//            case "playGame" -> quit();
+//            case "listGames" -> listGames(session, serverFacade, parameters);
+//            case "logout" -> logout(session, serverFacade, parameters);
+//            case "observeGame" -> observevGame(session, serverFacade, parameters);
+//            case "playGame" -> playGame(session, serverFacade, parameters);
             default -> unknownCommand(command);
         };
     }
+    private String createGame(Session session, ServerFacade serverFacade, String[] input) {
+        GameData response;
+        try {
+            response = serverFacade.createGame(
+                new GameData(0, null, null, input[0], null),
+                session.getAuthToken()
+            );
+        } catch (HttpException error) {
+            System.out.println(error.getStatus() + ": " + error.getMessage());
+            return null;
+        }
+        System.out.println("Game successfully created with id: " + response.gameID());
+        return "Success";
+    }
     private String help() {
         String helpPrompt = """
-            Commands:
+            Logged In Commands:
             help - Shows available commands
             logout - Logout of your account
             createGame - End your connection
@@ -32,8 +49,20 @@ public class PostLogin implements CommandHandler {
         System.out.println(helpPrompt);
         return null;
     }
+//    private String listGames() {
+//
+//    }
+//    private String logout() {
+//
+//    }
+//    private String observevGame() {
+//
+//    }
+//    private String playGame() {
+//
+//    }
     private String unknownCommand(String input) {
-        System.out.println("Unknown Command: " + input + "\nType \"help\" for a list of commands");
+        System.out.println("Unknown Command: " + input + "\nType \"help\" for a list of logged in commands");
         return null;
     }
 }

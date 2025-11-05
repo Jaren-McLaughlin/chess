@@ -17,10 +17,10 @@ public class ServerFacade {
     }
 
     // Game
-    public void createGame(GameData gameData, String authToken) throws HttpException {
+    public GameData createGame(GameData gameData, String authToken) throws HttpException {
         HttpRequest request = httpRequest("POST", "/game", gameData, authToken);
         HttpResponse<String> response = sendRequest(request);
-        handleResponse(response, null);
+        return handleResponse(response, GameData.class);
     }
 
     public GameListData getGameList(String authToken) throws HttpException {

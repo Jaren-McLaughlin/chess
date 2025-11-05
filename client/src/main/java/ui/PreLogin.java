@@ -23,7 +23,7 @@ public class PreLogin implements CommandHandler {
 
     private String help() {
         String helpPrompt = """
-            Commands:
+            Logged Out Commands:
             help - Shows available commands
             login <Username> <Password> - Log into your account
             quit - End your connection
@@ -33,8 +33,16 @@ public class PreLogin implements CommandHandler {
         return null;
     }
     private String login(Session session, ServerFacade serverFacade, String[] input) {
-
-        return null;
+        AuthData response;
+        try {
+            response = serverFacade.login(new UserData(input[0], input[1], null));
+        } catch (HttpException error) {
+            System.out.println(error.getStatus() + ": " + error.getMessage());
+            return null;
+        }
+        session.setAuthToken(response.authToken());
+        session.setCommandHandler(new PostLogin());
+        return "Success";
     }
     private String quit() {
         return "quit";
@@ -52,7 +60,7 @@ public class PreLogin implements CommandHandler {
         return "Success";
     }
     private String unknownCommand(String input) {
-        System.out.println("Unknown Command: " + input + "\nType \"help\" for a list of commands");
+        System.out.println("Unknown Command: " + input + "\nType \"help\" for a list of logged out commands");
         return null;
     }
 }
