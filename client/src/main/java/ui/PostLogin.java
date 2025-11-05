@@ -3,6 +3,7 @@ package ui;
 import exception.HttpException;
 import model.AuthData;
 import model.GameData;
+import model.GameListData;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -15,10 +16,10 @@ public class PostLogin implements CommandHandler {
         return switch (command) {
             case "creategame" -> createGame(session, serverFacade, parameters);
             case "help" -> help();
-//            case "listGames" -> listGames(session, serverFacade, parameters);
-//            case "logout" -> logout(session, serverFacade, parameters);
-//            case "observeGame" -> observevGame(session, serverFacade, parameters);
-//            case "playGame" -> playGame(session, serverFacade, parameters);
+            case "listgames" -> listGames(session, serverFacade);
+            case "logout" -> logout(session, serverFacade);
+//            case "observegame" -> observevGame(session, serverFacade, parameters);
+//            case "playgame" -> playGame(session, serverFacade, parameters);
             default -> unknownCommand(command);
         };
     }
@@ -39,22 +40,38 @@ public class PostLogin implements CommandHandler {
     private String help() {
         String helpPrompt = """
             Logged In Commands:
-            help - Shows available commands
-            logout - Logout of your account
             createGame - End your connection
+            help - Shows available commands
             listGames - See all games
-            playGame - Join a game
+            logout - Logout of your account
             observeGame - Watch a game
+            playGame - Join a game
         """;
         System.out.println(helpPrompt);
         return null;
     }
-//    private String listGames() {
-//
-//    }
-//    private String logout() {
-//
-//    }
+    private String listGames(Session session, ServerFacade serverFacade) {
+        GameListData response;
+        try {
+            response = serverFacade.getGameList(session.getAuthToken());
+        } catch (HttpException error) {
+            System.out.println(error.getStatus() + ": " + error.getMessage());
+            return null;
+        }
+        System.out.println("List of games: " + response);
+        return "Success";
+    }
+    private String logout(Session session, ServerFacade serverFacade) {
+        try {
+            serverFacade.logout(session.getAuthToken());
+        } catch (HttpException error) {
+            System.out.println(error.getStatus() + ": " + error.getMessage());
+            return null;
+        }
+        session.setCommandHandler(new PreLogin());
+        session.setAuthToken(null);
+        return "Success";
+    }
 //    private String observevGame() {
 //
 //    }
