@@ -27,6 +27,10 @@ public class PostLogin implements CommandHandler {
         };
     }
     private String createGame(Session session, ServerFacade serverFacade, String[] input) {
+        if (input.length < 1) {
+            System.out.println("Invalid options for creating a game, please follow this format: createGame <Game Name>");
+            return null;
+        }
         GameData response;
         try {
             response = serverFacade.createGame(
@@ -34,7 +38,10 @@ public class PostLogin implements CommandHandler {
                 session.getAuthToken()
             );
         } catch (HttpException error) {
-            System.out.println(error.getStatus() + ": " + error.getMessage());
+            System.out.println(error.getMessage());
+            return null;
+        } catch (IllegalArgumentException error) {
+            System.out.println("Error: Invalid parameter provided");
             return null;
         }
         System.out.println("Game successfully created with id: " + response.gameID());
@@ -58,7 +65,7 @@ public class PostLogin implements CommandHandler {
         try {
             response = serverFacade.getGameList(session.getAuthToken());
         } catch (HttpException error) {
-            System.out.println(error.getStatus() + ": " + error.getMessage());
+            System.out.println(error.getMessage());
             return null;
         }
         System.out.println("List of games: " + response);
@@ -68,29 +75,43 @@ public class PostLogin implements CommandHandler {
         try {
             serverFacade.logout(session.getAuthToken());
         } catch (HttpException error) {
-            System.out.println(error.getStatus() + ": " + error.getMessage());
+            System.out.println(error.getMessage());
             return null;
         }
         session.setCommandHandler(new PreLogin());
         session.setAuthToken(null);
+        System.out.println("Successfully logged out, type \"help\" to see a list of logged out commands");
         return "Success";
     }
     private String observeGame(Session session, ServerFacade serverFacade, String[] input) {
-        int gameId = Integer.parseInt(input[0]);
-        session.setCommandHandler(new GamePlay());
-        session.setGameId(gameId);
-        GameData gameData;
-        try {
-            gameData = serverFacade.getGameDetails(gameId, session.getAuthToken());
-        } catch (HttpException error) {
-            System.out.println(error.getStatus() + ": " + error.getMessage());
+        if (input.length < 1) {
+            System.out.println("Invalid options for observing a game, please follow this format: observeGame <gameId>");
             return null;
         }
+        int gameId;
+        GameData gameData;
+        try {
+            gameId = Integer.parseInt(input[0]);
+            gameData = serverFacade.getGameDetails(gameId, session.getAuthToken());
+        } catch (HttpException error) {
+            System.out.println(error.getMessage());
+            return null;
+        } catch (IllegalArgumentException error) {
+            System.out.println("Error: Invalid parameter provided");
+            return null;
+        }
+        session.setCommandHandler(new GamePlay());
+        session.setGameId(gameId);
         ChessBoard chessBoard = gameData.game().getBoard();
         ChessBoardUi.drawFromWhite(chessBoard);
+        System.out.println("Welcome to the gameplay, type \"help\" to see list commands");
         return "Success";
     }
     private String playGame(Session session, ServerFacade serverFacade, String[] input) {
+        if (input.length < 2) {
+            System.out.println("Invalid options for playing a game, please follow this format:  playGame <Team Color [WHITE|BLACK]> <gameId>");
+            return null;
+        }
         int gameId;
         ChessGame.TeamColor teamColor;
         String authToken = session.getAuthToken();
@@ -99,7 +120,10 @@ public class PostLogin implements CommandHandler {
             gameId = Integer.parseInt(input[1]);
             serverFacade.joinGame(new JoinGameData(teamColor, gameId), authToken);
         } catch (HttpException error) {
-            System.out.println(error.getStatus() + ": " + error.getMessage());
+            System.out.println(error.getMessage());
+            return null;
+        } catch (IllegalArgumentException error) {
+            System.out.println("Error: Invalid parameter provided");
             return null;
         }
         session.setCommandHandler(new GamePlay());
@@ -108,7 +132,7 @@ public class PostLogin implements CommandHandler {
         try {
             gameData = serverFacade.getGameDetails(gameId, authToken);
         } catch (HttpException error) {
-            System.out.println(error.getStatus() + ": " + error.getMessage());
+            System.out.println(error.getMessage());
             return null;
         }
         System.out.println(gameData.toString());
@@ -118,6 +142,7 @@ public class PostLogin implements CommandHandler {
         } else {
             ChessBoardUi.drawFromBlack(chessBoard);
         }
+        System.out.println("Welcome to the gameplay, type \"help\" to see list commands");
         return "Success";
     }
     private String unknownCommand(String input) {

@@ -37,6 +37,7 @@ public class GamePlay implements CommandHandler {
     private String leave(Session session, ServerFacade serverFacade) {
         session.setGameId(0);
         session.setCommandHandler(new PostLogin());
+        System.out.println("Successfully left game");
         return "success";
     }
     private String unknownCommand(String input) {

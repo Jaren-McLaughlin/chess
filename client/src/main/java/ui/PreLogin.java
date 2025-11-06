@@ -33,30 +33,47 @@ public class PreLogin implements CommandHandler {
         return null;
     }
     private String login(Session session, ServerFacade serverFacade, String[] input) {
+        if (input.length < 2) {
+            System.out.println("Invalid options for login, please follow this format: login <Username> <Password>");
+            return null;
+        }
         AuthData response;
         try {
             response = serverFacade.login(new UserData(input[0], input[1], null));
         } catch (HttpException error) {
-            System.out.println(error.getStatus() + ": " + error.getMessage());
+            System.out.println(error.getMessage());
+            return null;
+        } catch (IllegalArgumentException error) {
+            System.out.println("Error: Invalid parameter provided");
             return null;
         }
         session.setAuthToken(response.authToken());
         session.setCommandHandler(new PostLogin());
+        System.out.println("Successfully logged in, type \"help\" to view a list of logged in commands");
         return "Success";
     }
     private String quit() {
+        System.out.println("Closing connection, goodbye.");
         return "quit";
     }
     private String register(Session session, ServerFacade serverFacade, String[] input) {
+        if (input.length < 3) {
+            System.out.println("Invalid options for registering an account, please follow this format: register <Username> <Password> <Email>");
+            return null;
+        }
         AuthData response;
         try {
             response = serverFacade.createUser(new UserData(input[0], input[1], input[2]));
         } catch (HttpException error) {
-            System.out.println(error.getStatus() + ": " + error.getMessage());
+            System.out.println(error.getMessage());
+            return null;
+        } catch (IllegalArgumentException error) {
+            System.out.println("Error: Invalid parameter provided");
             return null;
         }
         session.setAuthToken(response.authToken());
         session.setCommandHandler(new PostLogin());
+        System.out.println("Successfully created account!");
         return "Success";
     }
     private String unknownCommand(String input) {
