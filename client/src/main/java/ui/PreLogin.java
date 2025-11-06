@@ -73,7 +73,7 @@ public class PreLogin implements CommandHandler {
         }
         session.setAuthToken(response.authToken());
         session.setCommandHandler(new PostLogin());
-        System.out.println("Successfully created account!");
+        System.out.println("Successfully created account! Type \"help\" to view the logged in commands");
         return "Success";
     }
     private String unknownCommand(String input) {

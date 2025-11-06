@@ -68,7 +68,15 @@ public class PostLogin implements CommandHandler {
             System.out.println(error.getMessage());
             return null;
         }
-        System.out.println("List of games: " + response);
+        for (GameData gameData: response.games()) {
+            System.out.println(
+                "game " + gameData.gameID() +
+                " [Game Name: \"" + gameData.gameName() +
+                "\", White Player: \"" + gameData.whiteUsername() +
+                "\", Black Player: \"" + gameData.blackUsername() +
+                "\"]"
+            );
+        }
         return "Success";
     }
     private String logout(Session session, ServerFacade serverFacade) {

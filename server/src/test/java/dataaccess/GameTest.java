@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.mysqlataaccess.AuthSQLDao;
 import dataaccess.mysqlataaccess.GameSQLDao;
 import model.GameData;
@@ -16,6 +18,8 @@ import java.sql.Statement;
 
 public class GameTest {
     private GameDao gameDao = null;
+    private static final ChessGame chessGame = new ChessGame();
+
     public GameTest() {
         try {
             this.gameDao = new GameSQLDao();
@@ -26,6 +30,7 @@ public class GameTest {
 
     @BeforeAll
     static void beforeClear() throws DataAccessException {
+        chessGame.getBoard().resetBoard();
         AuthDao authDao = new AuthSQLDao();
         authDao.clearDb();
     }
@@ -48,11 +53,12 @@ public class GameTest {
             Statement query = con.createStatement();
             ResultSet result = query.executeQuery(statement);
             if (result.next()) {
+                ChessGame responseGame = new Gson().fromJson(result.getString("game"), ChessGame.class);
                 Assertions.assertEquals(1, result.getInt("gameId"));
                 Assertions.assertEquals("test", result.getString("whiteUsername"));
                 Assertions.assertEquals("test2", result.getString("blackUsername"));
                 Assertions.assertEquals("myGame", result.getString("gameName"));
-                Assertions.assertEquals("null", result.getString("game"));
+                Assertions.assertEquals(chessGame, responseGame);
             }
         } catch (DataAccessException | SQLException error) {
             throw new DataAccessException("SQL Error: " + error);
@@ -72,11 +78,12 @@ public class GameTest {
             Statement query = con.createStatement();
             ResultSet result = query.executeQuery(statement);
             if (result.next()) {
+                ChessGame responseGame = new Gson().fromJson(result.getString("game"), ChessGame.class);
                 Assertions.assertEquals(1, result.getInt("gameId"));
                 Assertions.assertNull(result.getString("whiteUsername"));
                 Assertions.assertNull(result.getString("blackUsername"));
                 Assertions.assertEquals("CantBeNull", result.getString("gameName"));
-                Assertions.assertEquals("null", result.getString("game"));
+                Assertions.assertEquals(chessGame, responseGame);
             }
         } catch (DataAccessException | SQLException error) {
             throw new DataAccessException("SQL Error: " + error);
@@ -96,7 +103,7 @@ public class GameTest {
         Assertions.assertEquals("test", gameData.whiteUsername());
         Assertions.assertEquals("test2", gameData.blackUsername());
         Assertions.assertEquals("myGame", gameData.gameName());
-        Assertions.assertNull(gameData.game());
+        Assertions.assertEquals(chessGame, gameData.game());
     }
     @Test
     void getNullGame() throws DataAccessException {
