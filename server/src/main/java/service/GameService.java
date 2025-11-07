@@ -21,6 +21,14 @@ public class GameService {
         }
     }
 
+    public GameData getGameById(int gameId) throws HttpException {
+        try {
+            return gameDao.getGame(gameId);
+        } catch (DataAccessException error) {
+            throw HttpException.internalServerError("Error: Internal Server Error " + error);
+        }
+    }
+
     public GameListData getGameList() throws HttpException {
         try {
             return gameDao.getGameList();

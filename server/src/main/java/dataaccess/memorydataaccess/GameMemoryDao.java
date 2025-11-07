@@ -1,5 +1,6 @@
 package dataaccess.memorydataaccess;
 
+import chess.ChessGame;
 import model.*;
 import dataaccess.GameDao;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class GameMemoryDao implements GameDao {
                 gameData.whiteUsername(),
                 gameData.blackUsername(),
                 gameData.gameName(),
-                gameData.game()
+                new ChessGame()
         );
         game.put(numberOfGames, newGameData);
         numberOfGames++;

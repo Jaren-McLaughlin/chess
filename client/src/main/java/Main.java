@@ -1,8 +1,18 @@
-import chess.*;
+import exception.HttpException;
+import client.Repl;
 
 public class Main {
     public static void main(String[] args) {
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+        System.out.println("♕ 240 Chess Client: ");
+
+        String apiUrl = "http://localhost:8080";
+        if (args.length == 1) {
+            apiUrl = args[0];
+        }
+        try {
+            new Repl(apiUrl).run();
+        } catch (HttpException error) {
+            System.out.println("There was an error " + error);
+        }
     }
 }

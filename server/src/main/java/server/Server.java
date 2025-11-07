@@ -45,6 +45,7 @@ public class Server {
         // Game Handlers
             .delete("/db", this::clearDb)
             .get("/game", this::getGameList)
+            .get("/game/{id}", this::getGameById)
             .post("/game", this::createGame)
             .put("/game", this::joinGame)
             .exception(HttpException.class, (error, context) -> {
@@ -84,6 +85,14 @@ public class Server {
         String authToken = context.header("Authorization");
         userService.verifyToken(authToken);
         GameListData response = gameService.getGameList();
+        context.json(new Gson().toJson(response));
+    }
+
+    private void getGameById (Context context) throws HttpException {
+        String authToken = context.header("Authorization");
+        userService.verifyToken(authToken);
+        int gameId = Integer.parseInt(context.pathParam("id"));
+        GameData response = gameService.getGameById(gameId);
         context.json(new Gson().toJson(response));
     }
 
