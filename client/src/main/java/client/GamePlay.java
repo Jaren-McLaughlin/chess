@@ -1,7 +1,6 @@
-package ui;
+package client;
 
 import exception.HttpException;
-import server.ServerFacade;
 
 import java.util.Arrays;
 

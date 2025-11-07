@@ -1,9 +1,8 @@
-package ui;
+package client;
 
 import exception.HttpException;
 import model.AuthData;
 import model.UserData;
-import server.ServerFacade;
 
 import java.util.Arrays;
 

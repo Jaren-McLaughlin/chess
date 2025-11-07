@@ -1,4 +1,4 @@
-package server;
+package client;
 
 import com.google.gson.Gson;
 import exception.HttpException;
@@ -12,7 +12,7 @@ import java.net.http.HttpResponse;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String apiUrl;
-    public ServerFacade (String url) {
+    public ServerFacade(String url) {
         this.apiUrl = url;
     }
 

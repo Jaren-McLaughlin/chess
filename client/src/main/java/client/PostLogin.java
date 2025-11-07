@@ -1,14 +1,12 @@
-package ui;
+package client;
 
 import chess.ChessBoard;
 import chess.ChessGame;
 import exception.HttpException;
-import model.AuthData;
 import model.GameData;
 import model.GameListData;
 import model.JoinGameData;
-import server.ServerFacade;
-
+import ui.ChessBoardUi;
 import java.util.Arrays;
 
 public class PostLogin implements CommandHandler {

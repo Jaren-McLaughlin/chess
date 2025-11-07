@@ -2,7 +2,6 @@ package service;
 
 import chess.ChessGame;
 import chess.ChessGame.TeamColor;
-import dataaccess.DataAccessException;
 import dataaccess.memorydataaccess.GameMemoryDao;
 import exception.HttpException;
 import model.*;

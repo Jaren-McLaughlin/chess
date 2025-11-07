@@ -1,7 +1,5 @@
-import chess.*;
 import exception.HttpException;
-import ui.ChessBoardUi;
-import ui.Repl;
+import client.Repl;
 
 public class Main {
     public static void main(String[] args) {
