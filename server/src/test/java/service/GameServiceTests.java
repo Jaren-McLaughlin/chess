@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 public class GameServiceTests {
 
     private final GameService gameService = new GameService(new GameMemoryDao());
-    private static final ChessGame chessGame = new ChessGame();
+    private static final ChessGame CHESS_GAME = new ChessGame();
 
     @BeforeAll
     static void createGameBoard() {
-        chessGame.getBoard().resetBoard();
+        CHESS_GAME.getBoard().resetBoard();
     }
 
     @AfterEach
@@ -32,7 +32,7 @@ public class GameServiceTests {
 
         GameListData gameDataList = gameService.getGameList();
         Assertions.assertEquals(1, gameDataList.games().size());
-        Assertions.assertTrue(gameDataList.games().contains(new GameData(response.gameID(), null, null, request.gameName(), chessGame)));
+        Assertions.assertTrue(gameDataList.games().contains(new GameData(response.gameID(), null, null, request.gameName(), CHESS_GAME)));
     }
 
     @Test
@@ -51,9 +51,9 @@ public class GameServiceTests {
 
         GameListData gameDataList = gameService.getGameList();
         Assertions.assertEquals(3, gameDataList.games().size());
-        Assertions.assertTrue(gameDataList.games().contains(new GameData(1, null, null, "My first game", chessGame)));
-        Assertions.assertTrue(gameDataList.games().contains(new GameData(2, null, null, "My Second game", chessGame)));
-        Assertions.assertTrue(gameDataList.games().contains(new GameData(3, null, null, "My Third game", chessGame)));
+        Assertions.assertTrue(gameDataList.games().contains(new GameData(1, null, null, "My first game", CHESS_GAME)));
+        Assertions.assertTrue(gameDataList.games().contains(new GameData(2, null, null, "My Second game", CHESS_GAME)));
+        Assertions.assertTrue(gameDataList.games().contains(new GameData(3, null, null, "My Third game", CHESS_GAME)));
 
     }
 
@@ -71,7 +71,7 @@ public class GameServiceTests {
         gameService.joinGame(new JoinGameData(TeamColor.WHITE, response.gameID()), "My Username");
 
         GameListData gameList = gameService.getGameList();
-        Assertions.assertTrue(gameList.games().contains(new GameData(response.gameID(), "My Username", null, response.gameName(), chessGame)));
+        Assertions.assertTrue(gameList.games().contains(new GameData(response.gameID(), "My Username", null, response.gameName(), CHESS_GAME)));
     }
 
     @Test

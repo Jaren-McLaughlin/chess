@@ -18,7 +18,7 @@ import java.sql.Statement;
 
 public class GameTest {
     private GameDao gameDao = null;
-    private static final ChessGame chessGame = new ChessGame();
+    private static final ChessGame CHESS_GAME = new ChessGame();
 
     public GameTest() {
         try {
@@ -30,7 +30,7 @@ public class GameTest {
 
     @BeforeAll
     static void beforeClear() throws DataAccessException {
-        chessGame.getBoard().resetBoard();
+        CHESS_GAME.getBoard().resetBoard();
         AuthDao authDao = new AuthSQLDao();
         authDao.clearDb();
     }
@@ -58,7 +58,7 @@ public class GameTest {
                 Assertions.assertEquals("test", result.getString("whiteUsername"));
                 Assertions.assertEquals("test2", result.getString("blackUsername"));
                 Assertions.assertEquals("myGame", result.getString("gameName"));
-                Assertions.assertEquals(chessGame, responseGame);
+                Assertions.assertEquals(CHESS_GAME, responseGame);
             }
         } catch (DataAccessException | SQLException error) {
             throw new DataAccessException("SQL Error: " + error);
@@ -83,7 +83,7 @@ public class GameTest {
                 Assertions.assertNull(result.getString("whiteUsername"));
                 Assertions.assertNull(result.getString("blackUsername"));
                 Assertions.assertEquals("CantBeNull", result.getString("gameName"));
-                Assertions.assertEquals(chessGame, responseGame);
+                Assertions.assertEquals(CHESS_GAME, responseGame);
             }
         } catch (DataAccessException | SQLException error) {
             throw new DataAccessException("SQL Error: " + error);
@@ -103,7 +103,7 @@ public class GameTest {
         Assertions.assertEquals("test", gameData.whiteUsername());
         Assertions.assertEquals("test2", gameData.blackUsername());
         Assertions.assertEquals("myGame", gameData.gameName());
-        Assertions.assertEquals(chessGame, gameData.game());
+        Assertions.assertEquals(CHESS_GAME, gameData.game());
     }
     @Test
     void getNullGame() throws DataAccessException {

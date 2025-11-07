@@ -38,8 +38,4 @@ public class HttpException extends Exception {
         String message = map.get("message").toString();
         return new HttpException(status, message);
     }
-    public static HttpException rawError(int status,String message) {
-        return new HttpException(status, message);
-    }
 }
-// throw new HttpException(400, "Username required");

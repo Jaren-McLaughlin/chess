@@ -9,14 +9,14 @@ import server.Server;
 public class ServerFacadeTests {
     private static Server server;
     private static ServerFacade serverFacade;
-    private final static String apiUrl = "http://localhost:8080";
+    private final static String API_URL = "http://localhost:8080";
 
     @BeforeAll
     public static void init() throws HttpException {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        serverFacade = new ServerFacade(apiUrl);
+        serverFacade = new ServerFacade(API_URL);
         serverFacade.clearDb();
     }
 
@@ -39,7 +39,10 @@ public class ServerFacadeTests {
     }
     @Test
     public void notAuthorized() throws HttpException {
-        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->   serverFacade.createGame(new GameData(0, null, null, "MyGame", null), "Something"));
+        GameData gameData = new GameData(0, null, null, "MyGame", null);
+        HttpException thrownError = Assertions.assertThrows(
+                HttpException.class, () ->   serverFacade.createGame(gameData, "Something")
+        );
         Assertions.assertEquals("Error: Unauthorized", thrownError.getMessage());
     }
 
@@ -90,7 +93,9 @@ public class ServerFacadeTests {
         serverFacade.createGame(new GameData(0, null, null, "MyGame", null), user.authToken());
         serverFacade.joinGame(new JoinGameData(ChessGame.TeamColor.WHITE, 1), user.authToken());
 
-        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->    serverFacade.joinGame(new JoinGameData(ChessGame.TeamColor.WHITE, 1), user.authToken()));
+        HttpException thrownError = Assertions.assertThrows(
+            HttpException.class, () ->    serverFacade.joinGame(new JoinGameData(ChessGame.TeamColor.WHITE, 1), user.authToken())
+        );
         Assertions.assertEquals("Error: Color already taken", thrownError.getMessage());
     }
 
@@ -102,7 +107,9 @@ public class ServerFacadeTests {
     @Test
     public void userTaken() throws HttpException {
         AuthData user = serverFacade.createUser(new UserData("Test", "Test", "Test"));
-        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->    serverFacade.createUser(new UserData("Test", "Test", "Test")));
+        HttpException thrownError = Assertions.assertThrows(
+            HttpException.class, () ->    serverFacade.createUser(new UserData("Test", "Test", "Test"))
+        );
         Assertions.assertEquals("Error: account already taken", thrownError.getMessage());
     }
 
@@ -115,7 +122,9 @@ public class ServerFacadeTests {
     @Test
     public void invalidPassword() throws HttpException {
         serverFacade.createUser(new UserData("Test", "Test", "Test"));
-        HttpException thrownError = Assertions.assertThrows(HttpException.class, () ->    serverFacade.login(new UserData("Test", "AHHHIMNOTVALID", null)));
+        HttpException thrownError = Assertions.assertThrows(
+            HttpException.class, () ->    serverFacade.login(new UserData("Test", "AHHHIMNOTVALID", null))
+        );
         Assertions.assertEquals("Error: Unauthorized", thrownError.getMessage());
     }
 
