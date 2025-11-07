@@ -9,13 +9,13 @@ import server.Server;
 public class ServerFacadeTests {
     private static Server server;
     private static ServerFacade serverFacade;
-    private final static String API_URL = "http://localhost:8080";
 
     @BeforeAll
     public static void init() throws HttpException {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
+        String API_URL = "http://localhost:" + port;
         serverFacade = new ServerFacade(API_URL);
         serverFacade.clearDb();
     }
