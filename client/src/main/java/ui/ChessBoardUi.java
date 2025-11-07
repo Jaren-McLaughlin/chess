@@ -11,28 +11,38 @@ import java.nio.charset.StandardCharsets;
 import static ui.EscapeSequences.*;
 
 public final class ChessBoardUi {
-    private static final char[] col = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
-    private static final char[] colBackwards = {'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'};
-    private static final char[] row = {'8', '7', '6', '5', '4', '3', '2', '1'};
-    private static final char[] rowBackwards = {'1', '2', '3', '4', '5', '6', '7', '8'};
+    private static final char[] COL = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+    private static final char[] COL_BACKWARDS = {'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'};
+    private static final char[] ROW = {'8', '7', '6', '5', '4', '3', '2', '1'};
+    private static final char[] ROW_BACKWARDS = {'1', '2', '3', '4', '5', '6', '7', '8'};
 
-    public static void drawChessBoard(ChessPiece[][] chessGame, char[] col, char[] row) {
+    public static void drawChessBoard(ChessPiece[][] chessGame, char[] COL, char[] ROW) {
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
         out.flush();
 
-        String colString = ("    " + col[0] + " \u2003" + col[1] + " \u2003" + col[2] + " \u2003" + col[3] + " \u2003" + col[4] + " \u2003" + col[5] + " \u2003" + col[6] + " \u2003" + col[7] + "    " + NEW_LINE);
+        String colString = (
+            "    " + COL[0] +
+            " \u2003" + COL[1] +
+            " \u2003" + COL[2] +
+            " \u2003" + COL[3] +
+            " \u2003" + COL[4] +
+            " \u2003" + COL[5] +
+            " \u2003" + COL[6] +
+            " \u2003" + COL[7] +
+            "    " + NEW_LINE
+        );
         boarder(out, colString);
         boarder(out, ("  " + "┌" + "─".repeat(29) + "┐" + "  " + NEW_LINE));
         for (int i = 0; i < 8; i++) {
-            boarder(out, " " + row[i] + "│");
+            boarder(out, " " + ROW[i] + "│");
             if (i % 2 == 0) {
                 startLightRow(out, chessGame[i]);
             } else {
                 startDarkRow(out, chessGame[i]);
             }
-            boarder(out, ("│" + row[i] + " " + NEW_LINE));
+            boarder(out, ("│" + ROW[i] + " " + NEW_LINE));
         }
         
         boarder(out, ("  " + "└" + "─".repeat(29) + "┘" + "  " + NEW_LINE));
@@ -121,7 +131,7 @@ public final class ChessBoardUi {
             }
         }
 
-        drawChessBoard(gameBoard, col, row);
+        drawChessBoard(gameBoard, COL, ROW);
     }
 
     public static void drawFromBlack(ChessBoard chessBoard) {
@@ -133,6 +143,6 @@ public final class ChessBoardUi {
             }
         }
 
-        drawChessBoard(gameBoard, colBackwards, rowBackwards);
+        drawChessBoard(gameBoard, COL_BACKWARDS, ROW_BACKWARDS);
     }
 }
