@@ -15,8 +15,8 @@ public class ServerFacadeTests {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        String API_URL = "http://localhost:" + port;
-        serverFacade = new ServerFacade(API_URL);
+        String apiUrl = "http://localhost:" + port;
+        serverFacade = new ServerFacade(apiUrl);
         serverFacade.clearDb();
     }
 
