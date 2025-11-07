@@ -66,6 +66,10 @@ public class PostLogin implements CommandHandler {
             System.out.println(error.getMessage());
             return null;
         }
+        if (response.games().isEmpty()) {
+            System.out.println("No games found");
+            return "Success";
+        }
         for (GameData gameData: response.games()) {
             System.out.println(
                 "game " + gameData.gameID() +
@@ -104,6 +108,10 @@ public class PostLogin implements CommandHandler {
             return null;
         } catch (IllegalArgumentException error) {
             System.out.println("Error: Invalid parameter provided");
+            return null;
+        }
+        if (gameData == null) {
+            System.out.println("No game to observe");
             return null;
         }
         session.setCommandHandler(new GamePlay());
