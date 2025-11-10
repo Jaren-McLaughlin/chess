@@ -43,9 +43,7 @@ public class ServerFacade {
 
     // User
     public AuthData createUser (UserData userData) throws HttpException {
-//        System.out.println(userData);
         HttpRequest request = httpRequest("POST", "/user", userData, null);
-//        System.out.println(request);
         HttpResponse<String> response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
@@ -53,7 +51,6 @@ public class ServerFacade {
     public AuthData login (UserData userData) throws HttpException {
         HttpRequest request = httpRequest("POST", "/session", userData, null);
         HttpResponse<String> response = sendRequest(request);
-//        System.out.println(response);
         return handleResponse(response, AuthData.class);
     }
 
