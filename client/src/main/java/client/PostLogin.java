@@ -8,8 +8,10 @@ import model.GameListData;
 import model.JoinGameData;
 import ui.ChessBoardUi;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class PostLogin implements CommandHandler {
+    private HashMap<Integer, Integer> gameIdMap = new HashMap<>();
     public String executeCommand(Session session, ServerFacade serverFacade, String input) {
         String[] values = input.toLowerCase().split(" ");
         String command = (values.length > 0) ? values[0] : "help";
@@ -70,14 +72,18 @@ public class PostLogin implements CommandHandler {
             System.out.println("No games found");
             return "Success";
         }
+        int i = 0;
+        gameIdMap.clear();
         for (GameData gameData: response.games()) {
+            gameIdMap.put(i, gameData.gameID());
             System.out.println(
-                "game " + gameData.gameID() +
+                "Game " + i +
                 " [Game Name: \"" + gameData.gameName() +
                 "\", White Player: \"" + gameData.whiteUsername() +
                 "\", Black Player: \"" + gameData.blackUsername() +
                 "\"]"
             );
+            i++;
         }
         return "Success";
     }
@@ -98,10 +104,15 @@ public class PostLogin implements CommandHandler {
             System.out.println("Invalid options for observing a game, please follow this format: observeGame <gameId>");
             return null;
         }
-        int gameId;
+        Integer gameId;
         GameData gameData;
         try {
-            gameId = Integer.parseInt(input[0]);
+            int displayId = Integer.parseInt(input[0]);
+            gameId = gameIdMap.get(displayId);
+            if (gameId == null) {
+                System.out.println("No game to observe");
+                return null;
+            }
             gameData = serverFacade.getGameDetails(gameId, session.getAuthToken());
         } catch (HttpException error) {
             System.out.println(error.getMessage());
@@ -126,12 +137,17 @@ public class PostLogin implements CommandHandler {
             System.out.println("Invalid options for playing a game, please follow this format:  playGame <Team Color [WHITE|BLACK]> <gameId>");
             return null;
         }
-        int gameId;
+        Integer gameId;
         ChessGame.TeamColor teamColor;
         String authToken = session.getAuthToken();
         try {
             teamColor = ChessGame.TeamColor.valueOf(input[0].toUpperCase());
-            gameId = Integer.parseInt(input[1]);
+            int displayId = Integer.parseInt(input[1]);
+            gameId = gameIdMap.get(displayId);
+            if (gameId == null) {
+                System.out.println("No game to observe");
+                return null;
+            }
             serverFacade.joinGame(new JoinGameData(teamColor, gameId), authToken);
         } catch (HttpException error) {
             System.out.println(error.getMessage());
@@ -149,7 +165,6 @@ public class PostLogin implements CommandHandler {
             System.out.println(error.getMessage());
             return null;
         }
-        System.out.println(gameData.toString());
         ChessBoard chessBoard = gameData.game().getBoard();
         if (teamColor == ChessGame.TeamColor.WHITE) {
             ChessBoardUi.drawFromWhite(chessBoard);
