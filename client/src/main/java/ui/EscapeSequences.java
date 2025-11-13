@@ -20,7 +20,9 @@ public class EscapeSequences {
     public static final String EMPTY = " \u2003 ";
     public static final String BG_DARK_BROWN = UNICODE_ESCAPE + "[48;2;69;23;0m";
     public static final String BG_LIGHT_BROWN = UNICODE_ESCAPE + "[48;2;188;137;95m";
+    public static final String BG_LIGHT_BROWN_GOLD = UNICODE_ESCAPE + "[48;2;188;177;95m";
     public static final String BG_MEDIUM_BROWN = UNICODE_ESCAPE + "[48;2;152;81;45m";
+    public static final String BG_MEDIUM_BROWN_GOLD = UNICODE_ESCAPE + "[48;2;151;127;31m";
     public static final String TXT_BLACK = UNICODE_ESCAPE + "[38;2;0;0;0m";
     public static final String TXT_GOLD = UNICODE_ESCAPE + "[38;2;255;199;0m";
     public static final String TXT_WHITE = UNICODE_ESCAPE + "[38;2;255;255;255m";

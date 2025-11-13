@@ -56,15 +56,29 @@ public final class ChessBoardUi {
     }
 
     private static void lightSquare(PrintStream out, String text, String pieceColor) {
-        out.print(BG_LIGHT_BROWN);
-        out.print(pieceColor);
-        out.print(text);
+        boolean selectSquare = false;
+        if (selectSquare) {
+            out.print(BG_LIGHT_BROWN_GOLD);
+            out.print(pieceColor);
+            out.print(text);
+        } else {
+            out.print(BG_LIGHT_BROWN);
+            out.print(pieceColor);
+            out.print(text);
+        }
     }
 
     private static void darkSquare(PrintStream out, String text, String pieceColor) {
-        out.print(BG_MEDIUM_BROWN);
-        out.print(pieceColor);
-        out.print(text);
+        boolean selectSquare = false;
+        if (selectSquare) {
+            out.print(BG_MEDIUM_BROWN_GOLD);
+            out.print(pieceColor);
+            out.print(text);
+        } else {
+            out.print(BG_MEDIUM_BROWN);
+            out.print(pieceColor);
+            out.print(text);
+        }
     }
 
     private static String getTextFromEnum(ChessPiece.PieceType pieceType) {

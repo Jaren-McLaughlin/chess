@@ -2,9 +2,16 @@ package client;
 
 import exception.HttpException;
 
+import java.net.http.WebSocket;
 import java.util.Arrays;
 
 public class GamePlay implements CommandHandler {
+//    private final WebSocket webSocket;
+    public GamePlay() {
+//        implement websocket
+//        new Web
+    }
+
     public String executeCommand(Session session, ServerFacade serverFacade, String input) {
         String[] values = input.toLowerCase().split(" ");
         String command = (values.length > 0) ? values[0] : "help";
@@ -29,6 +36,10 @@ public class GamePlay implements CommandHandler {
             Game Play Commands:
             help - Shows available commands
             leave - Stop playing/observing a game
+            makeMove <Row><Col> <Row><Col> - Move a piece
+            redrawBoard - Redraws the board
+            resign - Forfeits the game
+            showMoves - Highlights all legal moves for a piece
         """;
         System.out.println(helpPrompt);
         return "success";
