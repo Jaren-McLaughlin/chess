@@ -22,6 +22,7 @@ public class Server {
     private final Javalin javalin;
     private final GameService gameService;
     private final UserService userService;
+//    private final WebSocketHandler webSocketHandler;
     private AuthDao authDao;
 
     public Server() {
@@ -37,6 +38,7 @@ public class Server {
         }
         this.gameService = new GameService(gameDao);
         this.userService = new UserService(authDao, userDao);
+//        webSocketHandler = new WebSocketHandler();
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
         // User Handlers
             .delete("/session", this::logout)
@@ -57,6 +59,11 @@ public class Server {
                 "error", error.getMessage()
                 ));
             });
+//            .ws("/ws", ws -> {
+//                ws.onConnect(webSocketHandler);
+//                ws.onMessage(webSocketHandler);
+//                ws.onClose(webSocketHandler);
+//            });
     }
     private void logout (Context context) throws HttpException {
         String authToken = context.header("Authorization");
