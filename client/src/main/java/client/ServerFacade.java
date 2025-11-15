@@ -49,13 +49,13 @@ public class ServerFacade {
     }
 
     public AuthData login (UserData userData) throws HttpException {
-        HttpRequest request = httpRequest("POST", "/session", userData, null);
+        HttpRequest request = httpRequest("POST", "/clientSession", userData, null);
         HttpResponse<String> response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
 
     public void logout (String authToken) throws HttpException {
-        HttpRequest request = httpRequest("DELETE", "/session", null, authToken);
+        HttpRequest request = httpRequest("DELETE", "/clientSession", null, authToken);
         HttpResponse<String> response = sendRequest(request);
         handleResponse(response, null);
     }

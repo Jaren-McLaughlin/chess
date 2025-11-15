@@ -12,21 +12,21 @@ import java.util.HashMap;
 
 public class PostLogin implements CommandHandler {
     private HashMap<Integer, Integer> gameIdMap = new HashMap<>();
-    public String executeCommand(Session session, ServerFacade serverFacade, String input) {
+    public String executeCommand(ClientSession clientSession, ServerFacade serverFacade, String input) {
         String[] values = input.toLowerCase().split(" ");
         String command = (values.length > 0) ? values[0] : "help";
         String[] parameters = Arrays.copyOfRange(values, 1, values.length);
         return switch (command) {
-            case "creategame" -> createGame(session, serverFacade, parameters);
+            case "creategame" -> createGame(clientSession, serverFacade, parameters);
             case "help" -> help();
-            case "listgames" -> listGames(session, serverFacade);
-            case "logout" -> logout(session, serverFacade);
-            case "observegame" -> observeGame(session, serverFacade, parameters);
-            case "playgame" -> playGame(session, serverFacade, parameters);
+            case "listgames" -> listGames(clientSession, serverFacade);
+            case "logout" -> logout(clientSession, serverFacade);
+            case "observegame" -> observeGame(clientSession, serverFacade, parameters);
+            case "playgame" -> playGame(clientSession, serverFacade, parameters);
             default -> unknownCommand(command);
         };
     }
-    private String createGame(Session session, ServerFacade serverFacade, String[] input) {
+    private String createGame(ClientSession clientSession, ServerFacade serverFacade, String[] input) {
         if (input.length < 1) {
             System.out.println("Invalid options for creating a game, please follow this format: createGame <Game Name>");
             return null;
@@ -35,7 +35,7 @@ public class PostLogin implements CommandHandler {
         try {
             response = serverFacade.createGame(
                 new GameData(0, null, null, input[0], null),
-                session.getAuthToken()
+                clientSession.getAuthToken()
             );
         } catch (HttpException error) {
             System.out.println(error.getMessage());
@@ -60,10 +60,10 @@ public class PostLogin implements CommandHandler {
         System.out.println(helpPrompt);
         return null;
     }
-    private String listGames(Session session, ServerFacade serverFacade) {
+    private String listGames(ClientSession clientSession, ServerFacade serverFacade) {
         GameListData response;
         try {
-            response = serverFacade.getGameList(session.getAuthToken());
+            response = serverFacade.getGameList(clientSession.getAuthToken());
         } catch (HttpException error) {
             System.out.println(error.getMessage());
             return null;
@@ -87,19 +87,19 @@ public class PostLogin implements CommandHandler {
         }
         return "Success";
     }
-    private String logout(Session session, ServerFacade serverFacade) {
+    private String logout(ClientSession clientSession, ServerFacade serverFacade) {
         try {
-            serverFacade.logout(session.getAuthToken());
+            serverFacade.logout(clientSession.getAuthToken());
         } catch (HttpException error) {
             System.out.println(error.getMessage());
             return null;
         }
-        session.setCommandHandler(new PreLogin());
-        session.setAuthToken(null);
+        clientSession.setCommandHandler(new PreLogin());
+        clientSession.setAuthToken(null);
         System.out.println("Successfully logged out, type \"help\" to see a list of logged out commands");
         return "Success";
     }
-    private String observeGame(Session session, ServerFacade serverFacade, String[] input) {
+    private String observeGame(ClientSession clientSession, ServerFacade serverFacade, String[] input) {
         if (input.length < 1) {
             System.out.println("Invalid options for observing a game, please follow this format: observeGame <gameId>");
             return null;
@@ -113,7 +113,7 @@ public class PostLogin implements CommandHandler {
                 System.out.println("No game to observe");
                 return null;
             }
-            gameData = serverFacade.getGameDetails(gameId, session.getAuthToken());
+            gameData = serverFacade.getGameDetails(gameId, clientSession.getAuthToken());
         } catch (HttpException error) {
             System.out.println(error.getMessage());
             return null;
@@ -125,21 +125,21 @@ public class PostLogin implements CommandHandler {
             System.out.println("No game to observe");
             return null;
         }
-        session.setCommandHandler(new GamePlay());
-        session.setGameId(gameId);
+        clientSession.setCommandHandler(new GamePlay());
+        clientSession.setGameId(gameId);
         ChessBoard chessBoard = gameData.game().getBoard();
         ChessBoardUi.drawFromWhite(chessBoard);
         System.out.println("Welcome to the gameplay, type \"help\" to see list commands");
         return "Success";
     }
-    private String playGame(Session session, ServerFacade serverFacade, String[] input) {
+    private String playGame(ClientSession clientSession, ServerFacade serverFacade, String[] input) {
         if (input.length < 2) {
             System.out.println("Invalid options for playing a game, please follow this format:  playGame <Team Color [WHITE|BLACK]> <gameId>");
             return null;
         }
         Integer gameId;
         ChessGame.TeamColor teamColor;
-        String authToken = session.getAuthToken();
+        String authToken = clientSession.getAuthToken();
         try {
             teamColor = ChessGame.TeamColor.valueOf(input[0].toUpperCase());
             int displayId = Integer.parseInt(input[1]);
@@ -156,8 +156,8 @@ public class PostLogin implements CommandHandler {
             System.out.println("Error: Invalid parameter provided");
             return null;
         }
-        session.setCommandHandler(new GamePlay());
-        session.setGameId(gameId);
+        clientSession.setCommandHandler(new GamePlay());
+        clientSession.setGameId(gameId);
         GameData gameData;
         try {
             gameData = serverFacade.getGameDetails(gameId, authToken);

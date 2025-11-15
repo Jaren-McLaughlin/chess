@@ -1,6 +1,6 @@
 package client;
 
-public class Session {
+public class ClientSession {
     private String authToken = null;
     private CommandHandler commandHandler = new PreLogin();
     private int gameId = 0;

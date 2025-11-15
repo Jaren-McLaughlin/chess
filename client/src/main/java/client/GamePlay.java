@@ -1,36 +1,42 @@
 package client;
 
 import exception.HttpException;
+import websocket.messages.ServerMessage;
 
-import java.net.http.WebSocket;
 import java.util.Arrays;
 
-public class GamePlay implements CommandHandler {
-//    private final WebSocket webSocket;
-    public GamePlay() {
-//        implement websocket
-//        new Web
+public class GamePlay implements CommandHandler, NotificationHandler {
+    private final WebSocketFacade webSocket;
+
+    public GamePlay(String url) throws HttpException {
+        webSocket = new WebSocketFacade(url, this);
     }
 
-    public String executeCommand(Session session, ServerFacade serverFacade, String input) {
+    public String executeCommand(ClientSession clientSession, ServerFacade serverFacade, String input) {
         String[] values = input.toLowerCase().split(" ");
         String command = (values.length > 0) ? values[0] : "help";
         String[] parameters = Arrays.copyOfRange(values, 1, values.length);
         return switch (command) {
-            case "redrawboard" -> drawBoard(session, serverFacade);
+            case "redrawboard" -> drawBoard(clientSession, serverFacade);
             case "help" -> help();
-            case "leave" -> leave(session, serverFacade);
+            case "leave" -> leave(clientSession, serverFacade);
             default -> unknownCommand(command);
         };
     }
-    private String drawBoard(Session session, ServerFacade serverFacade) {
+
+    public void message(ServerMessage serverMessage) {
+        System.out.print(serverMessage);
+    }
+
+    private String drawBoard(ClientSession clientSession, ServerFacade serverFacade) {
         try {
-            serverFacade.getGameList(session.getAuthToken());
+            serverFacade.getGameList(clientSession.getAuthToken());
         } catch (HttpException error) {
             System.out.println(error.getStatus() + error.getMessage());
         }
         return "Success";
     }
+
     private String help() {
         String helpPrompt = """
             Game Play Commands:
@@ -44,9 +50,9 @@ public class GamePlay implements CommandHandler {
         System.out.println(helpPrompt);
         return "success";
     }
-    private String leave(Session session, ServerFacade serverFacade) {
-        session.setGameId(0);
-        session.setCommandHandler(new PostLogin());
+    private String leave(ClientSession clientSession, ServerFacade serverFacade) {
+        clientSession.setGameId(0);
+        clientSession.setCommandHandler(new PostLogin());
         System.out.println("Successfully left game");
         return "success";
     }

@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class Repl {
     private final ServerFacade serverFacade;
-    private final Session session = new Session();
+    private final ClientSession clientSession = new ClientSession();
     public Repl(String apiUrl) throws HttpException {
         serverFacade = new ServerFacade(apiUrl);
     }
@@ -17,8 +17,8 @@ public class Repl {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             String line = scanner.nextLine();
-            CommandHandler commandHandler = session.getCommandHandler();
-            String result = commandHandler.executeCommand(session, serverFacade, line);
+            CommandHandler commandHandler = clientSession.getCommandHandler();
+            String result = commandHandler.executeCommand(clientSession, serverFacade, line);
             if (Objects.equals(result, "quit")) {
                 break;
             }
