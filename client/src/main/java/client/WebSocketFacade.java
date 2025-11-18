@@ -1,9 +1,11 @@
 package client;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import exception.HttpException;
 import jakarta.websocket.*;
-import websocket.messages.ServerMessage;
+import websocket.commands.UserGameCommand;
+import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,16 +27,27 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+                    NotificationMessage serverMessage = new Gson().fromJson(message, NotificationMessage.class);
                     notificationHandler.message(serverMessage);
                 }
             });
         }catch (DeploymentException | IOException | URISyntaxException ex) {
             throw HttpException.internalServerError("Something went wrong");
+        } catch (JsonSyntaxException error) {
+            error.printStackTrace();
         }
     }
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
+
+    public void connectToGame(ClientSession clientSession) {
+        UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, clientSession.getAuthToken(), clientSession.getGameId());
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException error) {
+            System.out.println("There was an error");
+        }
     }
 }

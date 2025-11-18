@@ -1,9 +1,10 @@
 package client;
 
 public class ClientSession {
-    private String authToken = null;
-    private CommandHandler commandHandler = new PreLogin();
-    private int gameId = 0;
+    private String authToken = "708c5e83-330a-41ad-9706-fdbdb029969e";
+    private CommandHandler commandHandler = new PreLogin();;
+    private int gameId = 1;
+    private String apiUrl;
 
     public String getAuthToken() {
         return authToken;
@@ -12,6 +13,9 @@ public class ClientSession {
         return commandHandler;
     }
     public int getGameId() { return gameId; }
+    public String getApiUrl() {
+        return apiUrl;
+    }
 
     public void setAuthToken (String authToken) {
         this.authToken = authToken;
@@ -21,5 +25,8 @@ public class ClientSession {
     }
     public void setGameId(int gameId) {
         this.gameId = gameId;
+    }
+    public void setApiUrl (String apiUrl) {
+        this.apiUrl = apiUrl;
     }
 }

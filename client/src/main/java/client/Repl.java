@@ -10,6 +10,9 @@ public class Repl {
     private final ClientSession clientSession = new ClientSession();
     public Repl(String apiUrl) throws HttpException {
         serverFacade = new ServerFacade(apiUrl);
+        clientSession.setApiUrl(apiUrl);
+//        System.out.println(clientSession.getApiUrl());
+//        clientSession.setCommandHandler(new GamePlay(clientSession));
     }
 
     public void run() {

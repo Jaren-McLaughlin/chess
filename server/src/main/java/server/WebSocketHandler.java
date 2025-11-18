@@ -65,7 +65,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         connections.add(session);
         String messageString = user + " joined the game";
-        ServerMessage message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, messageString);
+        NotificationMessage message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, messageString);
         try {
             connections.messageOthers(message, session);
         } catch (IOException error) {

@@ -1,6 +1,8 @@
 package server;
 
 //import jakarta.websocket.Session;
+import com.google.gson.Gson;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -19,8 +21,9 @@ public class ConnectionManager {
         sessions.remove(session);
     }
 
-    public void messageOthers(ServerMessage serverMessage, Session exludedSession) throws IOException {
-        String message = serverMessage.toString();
+    public void messageOthers(NotificationMessage serverMessage, Session exludedSession) throws IOException {
+        String message = new Gson().toJson(serverMessage);
+        System.out.println(message);
         for (Session session : sessions.values()) {
             if (session.isOpen()) {
                 if (session == exludedSession) continue;
@@ -28,8 +31,9 @@ public class ConnectionManager {
             }
         }
     }
-    public void messageUser(ServerMessage serverMessage, Session session) throws IOException {
-        String message = serverMessage.toString();
+    public void messageUser(NotificationMessage serverMessage, Session session) throws IOException {
+//        String message = serverMessage.toString();
+        String message = new Gson().toJson(serverMessage);
         if (session.isOpen()) {
             session.getRemote().sendString(message);
         }

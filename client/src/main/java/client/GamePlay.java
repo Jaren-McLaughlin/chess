@@ -1,6 +1,7 @@
 package client;
 
 import exception.HttpException;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
@@ -8,8 +9,17 @@ import java.util.Arrays;
 public class GamePlay implements CommandHandler, NotificationHandler {
     private final WebSocketFacade webSocket;
 
-    public GamePlay(String url) throws HttpException {
-        webSocket = new WebSocketFacade(url, this);
+    public GamePlay(ClientSession clientSession) {
+        WebSocketFacade ws = null;
+        try {
+            ws = new WebSocketFacade(clientSession.getApiUrl(), this);
+        } catch (HttpException error) {
+            System.out.println("Couldn't fetch websocket");
+        }
+        this.webSocket = ws;
+
+//        Send connect message
+        webSocket.connectToGame(clientSession);
     }
 
     public String executeCommand(ClientSession clientSession, ServerFacade serverFacade, String input) {
@@ -24,8 +34,8 @@ public class GamePlay implements CommandHandler, NotificationHandler {
         };
     }
 
-    public void message(ServerMessage serverMessage) {
-        System.out.print(serverMessage);
+    public void message(NotificationMessage serverMessage) {
+        System.out.print(serverMessage.getMessage());
     }
 
     private String drawBoard(ClientSession clientSession, ServerFacade serverFacade) {

@@ -110,8 +110,10 @@ public class PostLogin implements CommandHandler {
             int displayId = Integer.parseInt(input[0]);
             gameId = gameIdMap.get(displayId);
             if (gameId == null) {
-                System.out.println("No game to observe");
-                return null;
+//                System.out.println("No game to observe");
+//                return null;
+                // So I don't have to keep doing listGames
+                gameId = displayId;
             }
             gameData = serverFacade.getGameDetails(gameId, clientSession.getAuthToken());
         } catch (HttpException error) {
@@ -125,7 +127,7 @@ public class PostLogin implements CommandHandler {
             System.out.println("No game to observe");
             return null;
         }
-        clientSession.setCommandHandler(new GamePlay());
+        clientSession.setCommandHandler(new GamePlay(clientSession));
         clientSession.setGameId(gameId);
         ChessBoard chessBoard = gameData.game().getBoard();
         ChessBoardUi.drawFromWhite(chessBoard);
@@ -145,8 +147,10 @@ public class PostLogin implements CommandHandler {
             int displayId = Integer.parseInt(input[1]);
             gameId = gameIdMap.get(displayId);
             if (gameId == null) {
-                System.out.println("No game to observe");
-                return null;
+//                System.out.println("No game to observe");
+//                return null;
+                // So I don't have to keep doing listGames
+                gameId = displayId;
             }
             serverFacade.joinGame(new JoinGameData(teamColor, gameId), authToken);
         } catch (HttpException error) {
@@ -156,7 +160,7 @@ public class PostLogin implements CommandHandler {
             System.out.println("Error: Invalid parameter provided");
             return null;
         }
-        clientSession.setCommandHandler(new GamePlay());
+        clientSession.setCommandHandler(new GamePlay(clientSession));
         clientSession.setGameId(gameId);
         GameData gameData;
         try {

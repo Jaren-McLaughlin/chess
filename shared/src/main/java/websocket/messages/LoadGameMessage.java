@@ -6,8 +6,8 @@ public class LoadGameMessage extends ServerMessage{
         super(type);
         this.message = message;
     }
-    @Override
-    public String getMessage() {
-        return message;
-    }
+//    @Override
+//    public String getMessage() {
+//        return message;
+//    }
 }
