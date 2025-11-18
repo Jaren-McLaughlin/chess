@@ -127,8 +127,10 @@ public class PostLogin implements CommandHandler {
             System.out.println("No game to observe");
             return null;
         }
-        clientSession.setCommandHandler(new GamePlay(clientSession));
+        GamePlay command = new GamePlay(clientSession);
+        clientSession.setCommandHandler(command);
         clientSession.setGameId(gameId);
+        command.connectToGame(clientSession);
         ChessBoard chessBoard = gameData.game().getBoard();
         ChessBoardUi.drawFromWhite(chessBoard);
         System.out.println("Welcome to the gameplay, type \"help\" to see list commands");
@@ -160,8 +162,10 @@ public class PostLogin implements CommandHandler {
             System.out.println("Error: Invalid parameter provided");
             return null;
         }
-        clientSession.setCommandHandler(new GamePlay(clientSession));
+        GamePlay command = new GamePlay(clientSession);
+        clientSession.setCommandHandler(command);
         clientSession.setGameId(gameId);
+        command.connectToGame(clientSession);
         GameData gameData;
         try {
             gameData = serverFacade.getGameDetails(gameId, authToken);

@@ -6,6 +6,8 @@ import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 
+import static ui.EscapeSequences.NEW_LINE;
+
 public class GamePlay implements CommandHandler, NotificationHandler {
     private final WebSocketFacade webSocket;
 
@@ -17,8 +19,9 @@ public class GamePlay implements CommandHandler, NotificationHandler {
             System.out.println("Couldn't fetch websocket");
         }
         this.webSocket = ws;
+    }
 
-//        Send connect message
+    public void connectToGame(ClientSession clientSession) {
         webSocket.connectToGame(clientSession);
     }
 
@@ -29,13 +32,14 @@ public class GamePlay implements CommandHandler, NotificationHandler {
         return switch (command) {
             case "redrawboard" -> drawBoard(clientSession, serverFacade);
             case "help" -> help();
-            case "leave" -> leave(clientSession, serverFacade);
+            case "leave" -> leave(clientSession);
             default -> unknownCommand(command);
         };
     }
 
     public void message(NotificationMessage serverMessage) {
-        System.out.print(serverMessage.getMessage());
+        System.out.print(serverMessage.getMessage() + NEW_LINE);
+        System.out.print("> ");
     }
 
     private String drawBoard(ClientSession clientSession, ServerFacade serverFacade) {
@@ -60,7 +64,8 @@ public class GamePlay implements CommandHandler, NotificationHandler {
         System.out.println(helpPrompt);
         return "success";
     }
-    private String leave(ClientSession clientSession, ServerFacade serverFacade) {
+    private String leave(ClientSession clientSession) {
+        webSocket.leaveGame(clientSession);
         clientSession.setGameId(0);
         clientSession.setCommandHandler(new PostLogin());
         System.out.println("Successfully left game");

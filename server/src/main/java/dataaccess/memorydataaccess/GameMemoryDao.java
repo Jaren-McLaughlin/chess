@@ -1,6 +1,7 @@
 package dataaccess.memorydataaccess;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import model.*;
 import dataaccess.GameDao;
 import java.util.ArrayList;
@@ -29,6 +30,28 @@ public class GameMemoryDao implements GameDao {
     }
     public void insertUserIntoGame(GameData newData) {
         game.put(newData.gameID(), newData);
+    }
+    public void removeUser (int gameId, ChessGame.TeamColor teamColor) {
+        GameData gameData = game.get(gameId);
+        GameData newGameData;
+        if (ChessGame.TeamColor.WHITE == teamColor) {
+            newGameData = new GameData(
+                gameId,
+                null,
+                gameData.blackUsername(),
+                gameData.gameName(),
+                gameData.game()
+            );
+        } else {
+            newGameData = new GameData(
+                    gameId,
+                    gameData.whiteUsername(),
+                    null,
+                    gameData.gameName(),
+                    gameData.game()
+            );
+        }
+        game.put(gameId, newGameData);
     }
     public void clearDb() {
         game.clear();

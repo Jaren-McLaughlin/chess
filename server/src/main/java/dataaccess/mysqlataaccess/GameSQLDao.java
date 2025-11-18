@@ -8,6 +8,7 @@ import dataaccess.GameDao;
 import model.GameData;
 import model.GameListData;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +98,24 @@ public class GameSQLDao implements GameDao {
             query.setString(3, newData.gameName());
             query.setString(4, jsonGame);
             query.setInt(5, newData.gameID());
+            query.executeUpdate();
+        } catch (DataAccessException | SQLException error) {
+            throw new DataAccessException("SQL Error: " + error);
+        }
+    }
+
+    public void removeUser(int gameId, ChessGame.TeamColor teamColor) throws DataAccessException {
+        String userColor;
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            userColor = "whiteusername";
+        } else {
+            userColor = "blackusername";
+        }
+        String statement = "UPDATE game SET " + userColor + " = NULL WHERE gameId = ?";
+
+        try (Connection con = DatabaseManager.getConnection()) {
+            PreparedStatement query = con.prepareStatement(statement);
+            query.setInt(1, gameId);
             query.executeUpdate();
         } catch (DataAccessException | SQLException error) {
             throw new DataAccessException("SQL Error: " + error);

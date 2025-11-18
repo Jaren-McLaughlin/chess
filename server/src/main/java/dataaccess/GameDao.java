@@ -15,5 +15,7 @@ public interface GameDao {
     // Update game
     void insertUserIntoGame(GameData updateGameData) throws DataAccessException;
 
+    void removeUser(int gameId, TeamColor teamColor) throws DataAccessException;
+
     void clearDb() throws DataAccessException;
 }

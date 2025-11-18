@@ -50,4 +50,13 @@ public class WebSocketFacade extends Endpoint {
             System.out.println("There was an error");
         }
     }
+
+    public void leaveGame(ClientSession clientSession) {
+        UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, clientSession.getAuthToken(), clientSession.getGameId());
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException error) {
+            System.out.println("There was an error");
+        }
+    }
 }
