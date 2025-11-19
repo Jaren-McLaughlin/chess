@@ -43,10 +43,9 @@ public class WebSocketFacade extends Endpoint {
                         GameBoardMessage gameBoardMessage = new Gson().fromJson(serverMessage.getMessage(), GameBoardMessage.class);
                         if (gameBoardMessage.getDisplayFrom() == ChessGame.TeamColor.BLACK) {
                             ChessBoardUi.drawFromBlack(gameBoardMessage);
-                            System.out.print("> ");
-                            return;
+                        } else {
+                            ChessBoardUi.drawFromWhite(gameBoardMessage);
                         }
-                        ChessBoardUi.drawFromWhite(gameBoardMessage);
                         System.out.print("> ");
                     } else {
                         notificationHandler.message(serverMessage);
@@ -78,5 +77,19 @@ public class WebSocketFacade extends Endpoint {
         } catch (IOException error) {
             System.out.println("There was an error");
         }
+    }
+
+    public void makeMove(ClientSession clientSession, String[] parameters) {
+
+    }
+
+    public void redrawBoard(ClientSession clientSession) {
+
+    }
+    public void resign(ClientSession clientSession) {
+
+    }
+    public void showMoves(ClientSession clientSession, String[] parameters) {
+
     }
 }

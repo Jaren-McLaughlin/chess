@@ -30,9 +30,12 @@ public class GamePlay implements CommandHandler, NotificationHandler {
         String command = (values.length > 0) ? values[0] : "help";
         String[] parameters = Arrays.copyOfRange(values, 1, values.length);
         return switch (command) {
-            case "redrawboard" -> drawBoard(clientSession, serverFacade);
             case "help" -> help();
             case "leave" -> leave(clientSession);
+            case "makemove" -> makeMove(clientSession, parameters);
+            case "redrawboard" -> redrawBoard(clientSession);
+            case "resign" -> resign(clientSession);
+            case "showMoves" -> showMoves(clientSession, parameters);
             default -> unknownCommand(command);
         };
     }
@@ -40,15 +43,6 @@ public class GamePlay implements CommandHandler, NotificationHandler {
     public void message(NotificationMessage serverMessage) {
         System.out.print(serverMessage.getMessage() + NEW_LINE);
         System.out.print("> ");
-    }
-
-    private String drawBoard(ClientSession clientSession, ServerFacade serverFacade) {
-        try {
-            serverFacade.getGameList(clientSession.getAuthToken());
-        } catch (HttpException error) {
-            System.out.println(error.getStatus() + error.getMessage());
-        }
-        return "Success";
     }
 
     private String help() {
@@ -59,7 +53,7 @@ public class GamePlay implements CommandHandler, NotificationHandler {
             makeMove <Row><Col> <Row><Col> - Move a piece
             redrawBoard - Redraws the board
             resign - Forfeits the game
-            showMoves - Highlights all legal moves for a piece
+            showMoves <Row><Col> - Highlights all legal moves for a piece
         """;
         System.out.println(helpPrompt);
         return "success";
@@ -71,6 +65,27 @@ public class GamePlay implements CommandHandler, NotificationHandler {
         System.out.println("Successfully left game");
         return "success";
     }
+
+    private String makeMove (ClientSession clientSession, String[] parameters) {
+        webSocket.makeMove(clientSession, parameters);
+        return "Success";
+    }
+
+    private String redrawBoard(ClientSession clientSession) {
+        webSocket.redrawBoard(clientSession);
+        return "Success";
+    }
+
+    private String resign(ClientSession clientSession) {
+        webSocket.resign(clientSession);
+        return "Success";
+    }
+
+    private String showMoves(ClientSession clientSession, String[] parameters) {
+        webSocket.showMoves(clientSession, parameters);
+        return "Success";
+    }
+
     private String unknownCommand(String input) {
         System.out.println("Unknown Command: " + input + "\nType \"help\" for a list of game play commands");
         return null;

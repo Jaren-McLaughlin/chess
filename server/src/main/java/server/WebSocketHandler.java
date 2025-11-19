@@ -72,7 +72,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 gameData.game(),
                 teamColor
             );
-            gameBoardMessage.createPossibleMoves(new ChessPosition(2, 2));
             return new NotificationMessage(ServerMessage.ServerMessageType.LOAD_GAME, new Gson().toJson(gameBoardMessage));
         } catch (DataAccessException e) {
             System.out.println("There was an error");
