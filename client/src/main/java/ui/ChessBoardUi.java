@@ -1,12 +1,15 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+import websocket.messages.GameBoardMessage;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ui.EscapeSequences.*;
 
@@ -16,7 +19,8 @@ public final class ChessBoardUi {
     private static final char[] ROW = {'8', '7', '6', '5', '4', '3', '2', '1'};
     private static final char[] ROW_BACKWARDS = {'1', '2', '3', '4', '5', '6', '7', '8'};
 
-    public static void drawChessBoard(ChessPiece[][] chessGame, char[] col, char[] row) {
+    public static void drawChessBoard(cellPieceData[][] chessGame, char[] col, char[] row) {
+        System.out.println("Made it into the draw call");
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -55,9 +59,8 @@ public final class ChessBoardUi {
         out.print(text);
     }
 
-    private static void lightSquare(PrintStream out, String text, String pieceColor) {
-        boolean selectSquare = false;
-        if (selectSquare) {
+    private static void lightSquare(PrintStream out, String text, String pieceColor, boolean isHighlighted) {
+        if (isHighlighted) {
             out.print(BG_LIGHT_BROWN_GOLD);
             out.print(pieceColor);
             out.print(text);
@@ -68,9 +71,8 @@ public final class ChessBoardUi {
         }
     }
 
-    private static void darkSquare(PrintStream out, String text, String pieceColor) {
-        boolean selectSquare = false;
-        if (selectSquare) {
+    private static void darkSquare(PrintStream out, String text, String pieceColor, boolean isHighlighted) {
+        if (isHighlighted) {
             out.print(BG_MEDIUM_BROWN_GOLD);
             out.print(pieceColor);
             out.print(text);
@@ -102,58 +104,73 @@ public final class ChessBoardUi {
         };
     }
 
-    private static void startLightRow(PrintStream out, ChessPiece[] chessPiece) {
+    private static void startLightRow(PrintStream out, cellPieceData[] chessPiece) {
         for (int i = 0; i < 8; i++) {
-            ChessPiece piece = chessPiece[i];
+            cellPieceData piece = chessPiece[i];
             String text = EMPTY;
             String pieceColor = TXT_BLACK;
-            if (piece != null) {
-                text = getTextFromEnum(chessPiece[i].getPieceType());
-                pieceColor = getColorFromEnum(chessPiece[i].getTeamColor());
+            boolean isHighlighted = piece.isHighlighted();
+            if (piece.chessPiece() != null) {
+                text = getTextFromEnum(piece.chessPiece().getPieceType());
+                pieceColor = getColorFromEnum(piece.chessPiece().getTeamColor());
             }
             if (i % 2 == 0) {
-                lightSquare(out, text, pieceColor);
+                lightSquare(out, text, pieceColor, isHighlighted);
             } else {
-                darkSquare(out, text, pieceColor);
+                darkSquare(out, text, pieceColor, isHighlighted);
             }
         }
     }
 
-    private static void startDarkRow(PrintStream out, ChessPiece[] chessPiece) {
+    private static void startDarkRow(PrintStream out, cellPieceData[] chessPiece) {
         for (int i = 0; i < 8; i++) {
-            ChessPiece piece = chessPiece[i];
+            cellPieceData piece = chessPiece[i];
             String text = EMPTY;
             String pieceColor = TXT_BLACK;
-            if (piece != null) {
-                text = getTextFromEnum(chessPiece[i].getPieceType());
-                pieceColor = getColorFromEnum(chessPiece[i].getTeamColor());
+            boolean isHighlighted = piece.isHighlighted();
+            if (piece.chessPiece() != null) {
+                text = getTextFromEnum(piece.chessPiece().getPieceType());
+                pieceColor = getColorFromEnum(piece.chessPiece().getTeamColor());
             }
             if (i % 2 == 0) {
-                darkSquare(out, text, pieceColor);
+                darkSquare(out, text, pieceColor, isHighlighted);
             } else {
-                lightSquare(out, text, pieceColor);
+                lightSquare(out, text, pieceColor, isHighlighted);
             }
         }
     }
 
-    public static void drawFromWhite(ChessBoard chessBoard) {
-        ChessPiece[][] gameBoard = new ChessPiece[8][8];
-
+    public static void drawFromWhite(GameBoardMessage gameBoardMessage) {
+        cellPieceData[][] gameBoard = new cellPieceData[8][8];
+        ChessBoard chessBoard = gameBoardMessage.getChessGame().getBoard();
+        Collection<ChessMove> possibleMoves = gameBoardMessage.getPossibleMoves();
+        Set<ChessPosition> highlightPositions = possibleMoves.stream().map(ChessMove::getEndPosition).collect(Collectors.toSet());
         for (int i = 0; i < 8; i++) {
             for (int k = 0; k < 8; k++) {
-                gameBoard[i][k] = chessBoard.getPiece(new ChessPosition( 8 - i, k + 1));
+                ChessPosition piecePosition = new ChessPosition( 8 - i, k + 1);
+                ChessPiece chessPiece = chessBoard.getPiece(piecePosition);
+                boolean isHighlighted = highlightPositions.contains(piecePosition);
+
+                gameBoard[i][k] = new cellPieceData(chessPiece, isHighlighted);
             }
         }
 
         drawChessBoard(gameBoard, COL, ROW);
     }
 
-    public static void drawFromBlack(ChessBoard chessBoard) {
-        ChessPiece[][] gameBoard = new ChessPiece[8][8];
+    public static void drawFromBlack(GameBoardMessage gameBoardMessage) {
+        cellPieceData[][] gameBoard = new cellPieceData[8][8];
+        ChessBoard chessBoard = gameBoardMessage.getChessGame().getBoard();
+        Collection<ChessMove> possibleMoves = gameBoardMessage.getPossibleMoves();
+        Set<ChessPosition> highlightPositions = possibleMoves.stream().map(ChessMove::getEndPosition).collect(Collectors.toSet());
 
         for (int i = 0; i < 8; i++) {
             for (int k = 0; k < 8; k++) {
-                gameBoard[i][k] = chessBoard.getPiece(new ChessPosition(i + 1, 8 - k));
+                ChessPosition piecePosition = new ChessPosition(i + 1, 8 - k);
+                ChessPiece chessPiece = chessBoard.getPiece(piecePosition);
+                boolean isHighlighted = highlightPositions.contains(piecePosition);
+
+                gameBoard[i][k] = new cellPieceData(chessPiece, isHighlighted);
             }
         }
 

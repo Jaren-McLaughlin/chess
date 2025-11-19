@@ -131,8 +131,6 @@ public class PostLogin implements CommandHandler {
         clientSession.setCommandHandler(command);
         clientSession.setGameId(gameId);
         command.connectToGame(clientSession);
-        ChessBoard chessBoard = gameData.game().getBoard();
-        ChessBoardUi.drawFromWhite(chessBoard);
         System.out.println("Welcome to the gameplay, type \"help\" to see list commands");
         return "Success";
     }
@@ -166,19 +164,6 @@ public class PostLogin implements CommandHandler {
         clientSession.setCommandHandler(command);
         clientSession.setGameId(gameId);
         command.connectToGame(clientSession);
-        GameData gameData;
-        try {
-            gameData = serverFacade.getGameDetails(gameId, authToken);
-        } catch (HttpException error) {
-            System.out.println(error.getMessage());
-            return null;
-        }
-        ChessBoard chessBoard = gameData.game().getBoard();
-        if (teamColor == ChessGame.TeamColor.WHITE) {
-            ChessBoardUi.drawFromWhite(chessBoard);
-        } else {
-            ChessBoardUi.drawFromBlack(chessBoard);
-        }
         System.out.println("Welcome to the gameplay, type \"help\" to see list commands");
         return "Success";
     }

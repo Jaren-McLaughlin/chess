@@ -1,25 +1,34 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import exception.HttpException;
 import jakarta.websocket.*;
+import model.GameData;
+import ui.ChessBoardUi;
 import websocket.commands.UserGameCommand;
+import websocket.messages.GameBoardMessage;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static ui.EscapeSequences.NEW_LINE;
+
 public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler ;
+    ClientSession clientSession;
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws HttpException{
+    public WebSocketFacade(String url, NotificationHandler notificationHandler, ClientSession clientSession) throws HttpException{
         try {
             url = url.replace("http", "ws");
             URI uri = new URI(url + "/ws");
             this.notificationHandler = notificationHandler;
+            this.clientSession = clientSession;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, uri);
@@ -27,14 +36,25 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
+                    System.out.print(NEW_LINE);
                     NotificationMessage serverMessage = new Gson().fromJson(message, NotificationMessage.class);
-                    notificationHandler.message(serverMessage);
+                    ServerMessage.ServerMessageType messageType = serverMessage.getServerMessageType();
+                    if (messageType == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        GameBoardMessage gameBoardMessage = new Gson().fromJson(serverMessage.getMessage(), GameBoardMessage.class);
+                        if (gameBoardMessage.getDisplayFrom() == ChessGame.TeamColor.BLACK) {
+                            ChessBoardUi.drawFromBlack(gameBoardMessage);
+                            System.out.print("> ");
+                            return;
+                        }
+                        ChessBoardUi.drawFromWhite(gameBoardMessage);
+                        System.out.print("> ");
+                    } else {
+                        notificationHandler.message(serverMessage);
+                    }
                 }
             });
-        }catch (DeploymentException | IOException | URISyntaxException ex) {
+        } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw HttpException.internalServerError("Something went wrong");
-        } catch (JsonSyntaxException error) {
-            error.printStackTrace();
         }
     }
 

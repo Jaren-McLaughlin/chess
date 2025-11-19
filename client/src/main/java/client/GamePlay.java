@@ -14,7 +14,7 @@ public class GamePlay implements CommandHandler, NotificationHandler {
     public GamePlay(ClientSession clientSession) {
         WebSocketFacade ws = null;
         try {
-            ws = new WebSocketFacade(clientSession.getApiUrl(), this);
+            ws = new WebSocketFacade(clientSession.getApiUrl(), this, clientSession);
         } catch (HttpException error) {
             System.out.println("Couldn't fetch websocket");
         }

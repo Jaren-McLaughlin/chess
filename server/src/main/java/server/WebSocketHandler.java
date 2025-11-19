@@ -1,5 +1,6 @@
 package server;
 import chess.ChessGame;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import dataaccess.AuthDao;
 import dataaccess.DataAccessException;
@@ -17,6 +18,7 @@ import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
+import websocket.messages.GameBoardMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -63,6 +65,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
+    private NotificationMessage sendChessBoard(int gameId, ChessGame.TeamColor teamColor) {
+        try {
+            GameData gameData = gameDao.getGame(gameId);
+            GameBoardMessage gameBoardMessage = new GameBoardMessage(
+                gameData.game(),
+                teamColor
+            );
+            gameBoardMessage.createPossibleMoves(new ChessPosition(2, 2));
+            return new NotificationMessage(ServerMessage.ServerMessageType.LOAD_GAME, new Gson().toJson(gameBoardMessage));
+        } catch (DataAccessException e) {
+            System.out.println("There was an error");
+        }
+        return null;
+    }
+
     private String getUserByAuth (String  authToken) {
         try {
             return authDao.getUserByToken(authToken);
@@ -88,20 +105,23 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void createConnection (UserGameCommand userGameCommand, Session session) {
         String user = getUserByAuth(userGameCommand.getAuthToken());
+        int gameId = userGameCommand.getGameID();
         if (user == null) {
             System.out.println("Error: Somehow you lost your authToken");
             return;
         }
         connections.add(session);
-        ChessGame.TeamColor teamColor = getTeamColor(userGameCommand.getGameID(), user);
+        ChessGame.TeamColor teamColor = getTeamColor(gameId, user);
         String messageString;
         if (teamColor != null) {
             messageString = user + " has joined the game playing " + teamColor;
         } else {
             messageString = user + " has started observing the game";
         }
+        NotificationMessage gameBoard = sendChessBoard(gameId, teamColor);
         NotificationMessage message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, messageString);
         try {
+            connections.messageUser(gameBoard, session);
             connections.messageOthers(message, session);
         } catch (IOException error) {
             System.out.println("There was an error with this");
