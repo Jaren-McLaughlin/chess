@@ -1,8 +1,8 @@
 package client;
 
+import chess.ChessPosition;
 import exception.HttpException;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 
@@ -35,7 +35,7 @@ public class GamePlay implements CommandHandler, NotificationHandler {
             case "makemove" -> makeMove(clientSession, parameters);
             case "redrawboard" -> redrawBoard(clientSession);
             case "resign" -> resign(clientSession);
-            case "showMoves" -> showMoves(clientSession, parameters);
+            case "showmoves" -> showMoves(clientSession, parameters);
             default -> unknownCommand(command);
         };
     }
@@ -58,6 +58,7 @@ public class GamePlay implements CommandHandler, NotificationHandler {
         System.out.println(helpPrompt);
         return "success";
     }
+
     private String leave(ClientSession clientSession) {
         webSocket.leaveGame(clientSession);
         clientSession.setGameId(0);
@@ -82,12 +83,21 @@ public class GamePlay implements CommandHandler, NotificationHandler {
     }
 
     private String showMoves(ClientSession clientSession, String[] parameters) {
-        webSocket.showMoves(clientSession, parameters);
+        ChessPosition chessPosition = makeChessPosition(parameters[0]);
+        webSocket.showMoves(clientSession, chessPosition);
         return "Success";
     }
 
     private String unknownCommand(String input) {
         System.out.println("Unknown Command: " + input + "\nType \"help\" for a list of game play commands");
         return null;
+    }
+
+    private ChessPosition makeChessPosition(String rowColCombo) {
+        char charCol = rowColCombo.charAt(0);
+        char charRow = rowColCombo.charAt(1);
+        int intCol = charCol  - 'a' + 1;
+        int intRow = charRow - '0';
+        return new ChessPosition(intRow, intCol);
     }
 }

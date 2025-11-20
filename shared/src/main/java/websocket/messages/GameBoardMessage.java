@@ -31,6 +31,10 @@ public class GameBoardMessage {
 
     public Collection<ChessMove> createPossibleMoves (ChessPosition chessPiece) {
         Collection<ChessMove> possibleMoves = chessGame.validMoves(chessPiece);
+        System.out.println("List of possible moves: " + possibleMoves);
+        if (possibleMoves == null) {
+            return possibleMoves;
+        }
         this.possibleMoves = possibleMoves;
         return possibleMoves;
     }

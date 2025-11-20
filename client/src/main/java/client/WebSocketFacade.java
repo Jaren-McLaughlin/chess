@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import exception.HttpException;
@@ -8,6 +9,7 @@ import jakarta.websocket.*;
 import model.GameData;
 import ui.ChessBoardUi;
 import websocket.commands.UserGameCommand;
+import websocket.commands.UserGameCommandMessage;
 import websocket.messages.GameBoardMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -62,7 +64,7 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void connectToGame(ClientSession clientSession) {
-        UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, clientSession.getAuthToken(), clientSession.getGameId());
+        UserGameCommandMessage userGameCommand = new UserGameCommandMessage(UserGameCommand.CommandType.CONNECT, clientSession.getAuthToken(), clientSession.getGameId(), null);
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException error) {
@@ -71,7 +73,7 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void leaveGame(ClientSession clientSession) {
-        UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, clientSession.getAuthToken(), clientSession.getGameId());
+        UserGameCommandMessage userGameCommand = new UserGameCommandMessage(UserGameCommand.CommandType.LEAVE, clientSession.getAuthToken(), clientSession.getGameId(), null);
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException error) {
@@ -80,16 +82,38 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void makeMove(ClientSession clientSession, String[] parameters) {
-
+        UserGameCommandMessage userGameCommand = new UserGameCommandMessage(UserGameCommand.CommandType.MAKE_MOVE, clientSession.getAuthToken(), clientSession.getGameId(), new Gson().toJson(parameters));
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException error) {
+            System.out.println("There was an error");
+        }
     }
 
     public void redrawBoard(ClientSession clientSession) {
-
+        UserGameCommandMessage userGameCommand = new UserGameCommandMessage(UserGameCommand.CommandType.REDRAW_BOARD, clientSession.getAuthToken(), clientSession.getGameId(), null);
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException error) {
+            System.out.println("There was an error");
+        }
     }
+
     public void resign(ClientSession clientSession) {
-
+        UserGameCommandMessage userGameCommand = new UserGameCommandMessage(UserGameCommand.CommandType.RESIGN, clientSession.getAuthToken(), clientSession.getGameId(), null);
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException error) {
+            System.out.println("There was an error");
+        }
     }
-    public void showMoves(ClientSession clientSession, String[] parameters) {
 
+    public void showMoves(ClientSession clientSession, ChessPosition chessPosition) {
+        UserGameCommandMessage userGameCommand = new UserGameCommandMessage(UserGameCommand.CommandType.SHOW_MOVES, clientSession.getAuthToken(), clientSession.getGameId(), new Gson().toJson(chessPosition));
+        try {
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
+        } catch (IOException error) {
+            System.out.println("There was an error");
+        }
     }
 }

@@ -5,10 +5,7 @@ import websocket.messages.GameBoardMessage;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ui.EscapeSequences.*;
@@ -20,7 +17,6 @@ public final class ChessBoardUi {
     private static final char[] ROW_BACKWARDS = {'1', '2', '3', '4', '5', '6', '7', '8'};
 
     public static void drawChessBoard(cellPieceData[][] chessGame, char[] col, char[] row) {
-        System.out.println("Made it into the draw call");
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -145,12 +141,12 @@ public final class ChessBoardUi {
         ChessBoard chessBoard = gameBoardMessage.getChessGame().getBoard();
         Collection<ChessMove> possibleMoves = gameBoardMessage.getPossibleMoves();
         Set<ChessPosition> highlightPositions = possibleMoves.stream().map(ChessMove::getEndPosition).collect(Collectors.toSet());
+        System.out.println(chessBoard);
         for (int i = 0; i < 8; i++) {
             for (int k = 0; k < 8; k++) {
                 ChessPosition piecePosition = new ChessPosition( 8 - i, k + 1);
                 ChessPiece chessPiece = chessBoard.getPiece(piecePosition);
                 boolean isHighlighted = highlightPositions.contains(piecePosition);
-
                 gameBoard[i][k] = new cellPieceData(chessPiece, isHighlighted);
             }
         }

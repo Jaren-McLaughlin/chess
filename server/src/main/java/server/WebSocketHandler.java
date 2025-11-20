@@ -1,5 +1,6 @@
 package server;
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import dataaccess.AuthDao;
@@ -18,11 +19,13 @@ import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
+import websocket.commands.UserGameCommandMessage;
 import websocket.messages.GameBoardMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -46,32 +49,35 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleMessage(WsMessageContext ctx) {
-        UserGameCommand userGameCommand = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+        UserGameCommandMessage userGameCommand = new Gson().fromJson(ctx.message(), UserGameCommandMessage.class);
 
         switch (userGameCommand.getCommandType()) {
             case CONNECT -> createConnection(userGameCommand, ctx.session);
             case LEAVE -> leaveGame(userGameCommand, ctx.session);
             case MAKE_MOVE -> movePiece(userGameCommand, ctx.session);
             case RESIGN -> resign(userGameCommand, ctx.session);
+            case REDRAW_BOARD -> redrawBoard(userGameCommand, ctx.session);
+            case SHOW_MOVES -> showMoves(userGameCommand, ctx.session);
         }
     }
 
     @Override
-    public void handleClose(WsCloseContext ctx) {
-    }
-
+    public void handleClose(WsCloseContext ctx) {}
 
     private void canMove() {
 
     }
 
-    private NotificationMessage sendChessBoard(int gameId, ChessGame.TeamColor teamColor) {
+    private NotificationMessage sendChessBoard(int gameId, ChessGame.TeamColor teamColor, ChessPosition chessPosition) {
         try {
             GameData gameData = gameDao.getGame(gameId);
             GameBoardMessage gameBoardMessage = new GameBoardMessage(
                 gameData.game(),
                 teamColor
             );
+            if (chessPosition != null) {
+                gameBoardMessage.createPossibleMoves(chessPosition);
+            }
             return new NotificationMessage(ServerMessage.ServerMessageType.LOAD_GAME, new Gson().toJson(gameBoardMessage));
         } catch (DataAccessException e) {
             System.out.println("There was an error");
@@ -102,7 +108,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         return null;
     }
 
-    private void createConnection (UserGameCommand userGameCommand, Session session) {
+    private void createConnection (UserGameCommandMessage userGameCommand, Session session) {
         String user = getUserByAuth(userGameCommand.getAuthToken());
         int gameId = userGameCommand.getGameID();
         if (user == null) {
@@ -117,7 +123,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } else {
             messageString = user + " has started observing the game";
         }
-        NotificationMessage gameBoard = sendChessBoard(gameId, teamColor);
+        NotificationMessage gameBoard = sendChessBoard(gameId, teamColor,null);
         NotificationMessage message = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, messageString);
         try {
             connections.messageUser(gameBoard, session);
@@ -128,7 +134,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void leaveGame (UserGameCommand userGameCommand, Session session) {
+    private void leaveGame (UserGameCommandMessage userGameCommand, Session session) {
         String user = getUserByAuth(userGameCommand.getAuthToken());
         if (user == null) {
             System.out.println("Error: Somehow you lost your authToken");
@@ -157,11 +163,38 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void movePiece (UserGameCommand userGameCommand, Session session) {
+    private void movePiece (UserGameCommandMessage userGameCommand, Session session) {
 
     }
 
-    private void resign (UserGameCommand userGameCommand, Session session) {
+    private void resign (UserGameCommandMessage userGameCommand, Session session) {
 
+    }
+
+    private void redrawBoard (UserGameCommandMessage userGameCommand, Session session) {
+        String user = getUserByAuth(userGameCommand.getAuthToken());
+        int gameId = userGameCommand.getGameID();
+        ChessGame.TeamColor drawFrom = getTeamColor(gameId, user);
+        NotificationMessage gameBoardMessage = sendChessBoard(gameId, drawFrom, null);
+        try {
+            connections.messageUser(gameBoardMessage, session);
+        } catch (IOException error) {
+            System.out.println("There was an error with this");
+            error.printStackTrace();
+        }
+    }
+
+    private void showMoves (UserGameCommandMessage userGameCommand, Session session) {
+        ChessPosition chessPosition = new Gson().fromJson(userGameCommand.getMessage(), ChessPosition.class);
+        int gameId = userGameCommand.getGameID();
+        String user = getUserByAuth(userGameCommand.getAuthToken());
+        ChessGame.TeamColor teamColor = getTeamColor(gameId, user);
+        NotificationMessage gameBoardMessage = sendChessBoard(gameId, teamColor, chessPosition);
+        try {
+            connections.messageUser(gameBoardMessage, session);
+        } catch (IOException error) {
+            System.out.println("There was an error with this");
+            error.printStackTrace();
+        }
     }
 }
