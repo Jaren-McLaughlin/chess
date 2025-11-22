@@ -9,24 +9,20 @@ import dataaccess.DataAccessException;
 import dataaccess.GameDao;
 import dataaccess.mysqlataaccess.AuthSQLDao;
 import dataaccess.mysqlataaccess.GameSQLDao;
-import exception.HttpException;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
 import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
-import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
-import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommandMessage;
 import websocket.messages.GameBoardMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -121,15 +117,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         return null;
     }
 
-    private boolean gameOver (int gameId) {
+    private boolean gameOver (int gameId, Session session) {
         ChessGame.GameStatus gameStatus = null;
         try {
             gameStatus = gameDao.getGameStatus(gameId);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        if (gameStatus != ChessGame.GameStatus.PLAYING) {
+        if (gameStatus == ChessGame.GameStatus.PLAYING) {
             return false;
+        }
+        String message = "The game is over, you can no longer make a move";
+        NotificationMessage gameOverMessage = new NotificationMessage(ServerMessage.ServerMessageType.ERROR, message);
+        try {
+            connections.messageUser(gameOverMessage, session);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return true;
     }
@@ -222,14 +225,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-// Probably needs to be way more complex, include in check/resigned logic, make an extra handler for that that checks all those things don't happen
     private void movePiece (UserGameCommandMessage userGameCommand, Session session) {
         ChessMove chessMove = new Gson().fromJson(userGameCommand.getMessage(), ChessMove.class);
-        String user = getUserByAuth(userGameCommand.getAuthToken());
         int gameId = userGameCommand.getGameID();
+
+        String user = getUserByAuth(userGameCommand.getAuthToken());
+        if (user == null) {
+            System.out.println("Error: Somehow you lost your authToken");
+            return;
+        }
+
+        if (gameOver(gameId, session)) return;
+
         boolean canMove = getCanMove(gameId, user);
         if (!canMove) {
-            System.out.println("AHHH you shouldn't be moving");
+            String message = "It is not your turn to move";
+            new NotificationMessage(ServerMessage.ServerMessageType.ERROR, message);
             return;
         }
 
@@ -281,6 +292,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void resign (UserGameCommandMessage userGameCommand, Session session) {
+        if (gameOver(userGameCommand.getGameID(), session)) return;
         try {
             gameDao.updateGameStatus(userGameCommand.getGameID(), ChessGame.GameStatus.RESIGNED);
         } catch (DataAccessException e) {

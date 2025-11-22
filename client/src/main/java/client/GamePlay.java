@@ -1,6 +1,5 @@
 package client;
 
-import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -82,7 +81,7 @@ public class GamePlay implements CommandHandler, NotificationHandler {
             try {
                 pawnPromotion = ChessPiece.PieceType.valueOf(parameters[2].toUpperCase());
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid pawn promotion, possible promotions: ");
+                System.out.println("Invalid pawn promotion, possible promotions: Bishop, Knight, Rook, Queen");
                 return null;
             }
         }
@@ -124,7 +123,7 @@ public class GamePlay implements CommandHandler, NotificationHandler {
             int intRow = charRow - '0';
             return new ChessPosition(intRow, intCol);
         } catch (Exception error) {
-            System.out.println("There was an error with the move, make sure each moveset is <Col><Row> for example d4");
+            System.out.println("Invalid moveset make sure each moveset is in this format <Col><Row> for example d4");
         }
         return null;
     }
