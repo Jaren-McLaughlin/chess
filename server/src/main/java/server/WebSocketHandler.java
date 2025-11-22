@@ -2,6 +2,7 @@ package server;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthDao;
 import dataaccess.DataAccessException;
@@ -64,8 +65,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleClose(WsCloseContext ctx) {}
 
-    private void canMove() {
-
+    private boolean getCanMove(int gameId, String user) {
+        boolean isTurn = false;
+        try {
+            GameData gameData = gameDao.getGame(gameId);
+            ChessGame chessGame = gameData.game();
+            ChessGame.TeamColor teamColor = getTeamColor(gameId, user);
+            ChessGame.TeamColor playerTurn = chessGame.getTeamTurn();
+            if (teamColor == playerTurn) {
+                isTurn = true;
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return isTurn;
     }
 
     private NotificationMessage sendChessBoard(int gameId, ChessGame.TeamColor teamColor, ChessPosition chessPosition) {
@@ -94,9 +107,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private ChessGame.TeamColor getTeamColor (int gamdId, String username) {
+    private ChessGame.TeamColor getTeamColor (int gameId, String username) {
         try {
-            GameData gameDetails = gameDao.getGame(gamdId);
+            GameData gameDetails = gameDao.getGame(gameId);
             if (Objects.equals(gameDetails.blackUsername(), username)) {
                 return ChessGame.TeamColor.BLACK;
             } else if (Objects.equals(gameDetails.whiteUsername(), username)) {
@@ -104,6 +117,29 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
         } catch (DataAccessException error) {
             return null;
+        }
+        return null;
+    }
+
+    private NotificationMessage getGameState (int gameId, ChessGame.TeamColor opponentColor) {
+        GameData gameData;
+        try {
+            gameData = gameDao.getGame(gameId);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        ChessGame chessGame = gameData.game();
+        if (chessGame.isInCheckmate(opponentColor)) {
+            String message = opponentColor.toString() + " is in checkmate, game over";
+            // Mark game as over
+            return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        } else if (chessGame.isInStalemate(opponentColor)) {
+            String message = "The match is in a stalemate, game over";
+            return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        } else if (chessGame.isInCheck(opponentColor)) {
+            String message = opponentColor.toString() + " is in check";
+            return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         }
         return null;
     }
@@ -163,8 +199,50 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
+// Probably needs to be way more complex, include in check/resigned logic, make an extra handler for that that checks all those things don't happen
     private void movePiece (UserGameCommandMessage userGameCommand, Session session) {
+        ChessMove chessMove = new Gson().fromJson(userGameCommand.getMessage(), ChessMove.class);
+        String user = getUserByAuth(userGameCommand.getAuthToken());
+        int gameId = userGameCommand.getGameID();
+        boolean canMove = getCanMove(gameId, user);
+        if (!canMove) {
+            System.out.println("AHHH you shouldn't be moving");
+            return;
+        }
 
+        GameData gameData;
+        try {
+            gameData = gameDao.getGame(gameId);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        ChessGame chessGame = gameData.game();
+        try {
+            chessGame.makeMove(chessMove);
+        } catch (InvalidMoveException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            gameDao.updateGameBoard(chessGame, gameId);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+//        This is so wrong haha, it messes up because it broadcasts it...
+        ChessGame.TeamColor drawFrom = getTeamColor(gameId, user);
+        NotificationMessage gameBoardMessage = sendChessBoard(gameId, drawFrom, null);
+        String message = "Movement happened";
+        NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        try {
+            connections.messageOthers(gameBoardMessage, session);
+            connections.messageUser(gameBoardMessage, session);
+            connections.messageOthers(notificationMessage, session);
+        } catch (IOException error) {
+            System.out.println("There was an error with this");
+            error.printStackTrace();
+        }
     }
 
     private void resign (UserGameCommandMessage userGameCommand, Session session) {

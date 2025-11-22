@@ -12,7 +12,7 @@ public class Repl {
         serverFacade = new ServerFacade(apiUrl);
         clientSession.setApiUrl(apiUrl);
 //        System.out.println(clientSession.getApiUrl());
-        clientSession.setCommandHandler(new GamePlay(clientSession));
+//        clientSession.setCommandHandler(new GamePlay(clientSession));
     }
 
     public void run() {

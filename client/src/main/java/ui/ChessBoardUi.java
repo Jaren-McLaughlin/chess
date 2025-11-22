@@ -141,7 +141,7 @@ public final class ChessBoardUi {
         ChessBoard chessBoard = gameBoardMessage.getChessGame().getBoard();
         Collection<ChessMove> possibleMoves = gameBoardMessage.getPossibleMoves();
         Set<ChessPosition> highlightPositions = possibleMoves.stream().map(ChessMove::getEndPosition).collect(Collectors.toSet());
-        System.out.println(chessBoard);
+//        System.out.println(chessBoard);
         for (int i = 0; i < 8; i++) {
             for (int k = 0; k < 8; k++) {
                 ChessPosition piecePosition = new ChessPosition( 8 - i, k + 1);

@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -43,7 +44,7 @@ public class WebSocketFacade extends Endpoint {
                     ServerMessage.ServerMessageType messageType = serverMessage.getServerMessageType();
                     if (messageType == ServerMessage.ServerMessageType.LOAD_GAME) {
                         GameBoardMessage gameBoardMessage = new Gson().fromJson(serverMessage.getMessage(), GameBoardMessage.class);
-                        if (gameBoardMessage.getDisplayFrom() == ChessGame.TeamColor.BLACK) {
+                        if (clientSession.getDisplayColor() == ChessGame.TeamColor.BLACK) {
                             ChessBoardUi.drawFromBlack(gameBoardMessage);
                         } else {
                             ChessBoardUi.drawFromWhite(gameBoardMessage);
@@ -81,8 +82,8 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void makeMove(ClientSession clientSession, String[] parameters) {
-        UserGameCommandMessage userGameCommand = new UserGameCommandMessage(UserGameCommand.CommandType.MAKE_MOVE, clientSession.getAuthToken(), clientSession.getGameId(), new Gson().toJson(parameters));
+    public void makeMove(ClientSession clientSession, ChessMove move) {
+        UserGameCommandMessage userGameCommand = new UserGameCommandMessage(UserGameCommand.CommandType.MAKE_MOVE, clientSession.getAuthToken(), clientSession.getGameId(), new Gson().toJson(move));
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException error) {

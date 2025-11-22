@@ -10,6 +10,7 @@ import java.util.HashMap;
 public class GameMemoryDao implements GameDao {
     private final HashMap<Integer, GameData> game = new HashMap<>();
     private int numberOfGames = 1;
+    private final HashMap<Integer, ChessGame.GameStatus> gameStatuses = new HashMap<>();
     public GameData addGame(GameData gameData) {
         GameData newGameData = new GameData(
                 numberOfGames,
@@ -19,6 +20,7 @@ public class GameMemoryDao implements GameDao {
                 new ChessGame()
         );
         game.put(numberOfGames, newGameData);
+        gameStatuses.put(numberOfGames, ChessGame.GameStatus.PLAYING);
         numberOfGames++;
         return newGameData;
     }
@@ -27,6 +29,9 @@ public class GameMemoryDao implements GameDao {
     }
     public GameListData getGameList() {
         return new GameListData(new ArrayList<>(game.values()));
+    }
+    public ChessGame.GameStatus getGameStatus(int gameId) {
+        return gameStatuses.get(gameId);
     }
     public void insertUserIntoGame(GameData newData) {
         game.put(newData.gameID(), newData);
@@ -52,6 +57,9 @@ public class GameMemoryDao implements GameDao {
             );
         }
         game.put(gameId, newGameData);
+    }
+    public void updateGameBoard (ChessGame chessGame, int gameId) {
+        gameStatuses.put(gameId, ChessGame.GameStatus.PLAYING);
     }
     public void clearDb() {
         game.clear();

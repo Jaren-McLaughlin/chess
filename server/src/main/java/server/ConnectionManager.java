@@ -31,6 +31,7 @@ public class ConnectionManager {
             }
         }
     }
+
     public void messageUser(NotificationMessage serverMessage, Session session) throws IOException {
 //        String message = serverMessage.toString();
         String message = new Gson().toJson(serverMessage);

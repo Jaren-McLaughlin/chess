@@ -72,7 +72,7 @@ public class PostLogin implements CommandHandler {
             System.out.println("No games found");
             return "Success";
         }
-        int i = 0;
+        int i = 1;
         gameIdMap.clear();
         for (GameData gameData: response.games()) {
             gameIdMap.put(i, gameData.gameID());
@@ -129,6 +129,7 @@ public class PostLogin implements CommandHandler {
         }
         GamePlay command = new GamePlay(clientSession);
         clientSession.setCommandHandler(command);
+        clientSession.setDisplayColor(ChessGame.TeamColor.WHITE);
         clientSession.setGameId(gameId);
         command.connectToGame(clientSession);
         System.out.println("Welcome to the gameplay, type \"help\" to see list commands");
@@ -162,6 +163,7 @@ public class PostLogin implements CommandHandler {
         }
         GamePlay command = new GamePlay(clientSession);
         clientSession.setCommandHandler(command);
+        clientSession.setDisplayColor(teamColor);
         clientSession.setGameId(gameId);
         command.connectToGame(clientSession);
         System.out.println("Welcome to the gameplay, type \"help\" to see list commands");

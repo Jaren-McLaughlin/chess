@@ -67,6 +67,13 @@ public class ChessGame {
         BLACK
     }
 
+    public enum GameStatus {
+        CHECKMATE,
+        PLAYING,
+        RESIGNED,
+        STALEMATE,
+    }
+
     private TeamColor getMovingColor (ChessMove move) {
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = chessBoard.getPiece(startPosition);

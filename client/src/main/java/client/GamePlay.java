@@ -1,5 +1,7 @@
 package client;
 
+import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import exception.HttpException;
 import websocket.messages.NotificationMessage;
@@ -50,10 +52,10 @@ public class GamePlay implements CommandHandler, NotificationHandler {
             Game Play Commands:
             help - Shows available commands
             leave - Stop playing/observing a game
-            makeMove <Row><Col> <Row><Col> - Move a piece
+            makeMove <Col><Row> <Col><Row> - Move a piece
             redrawBoard - Redraws the board
             resign - Forfeits the game
-            showMoves <Row><Col> - Highlights all legal moves for a piece
+            showMoves <Col><Row> - Highlights all legal moves for a piece
         """;
         System.out.println(helpPrompt);
         return "success";
@@ -68,7 +70,11 @@ public class GamePlay implements CommandHandler, NotificationHandler {
     }
 
     private String makeMove (ClientSession clientSession, String[] parameters) {
-        webSocket.makeMove(clientSession, parameters);
+        ChessPosition startPosition = makeChessPosition(parameters[0]);
+        ChessPosition endPosition = makeChessPosition(parameters[1]);
+//        ChessPiece endPosition = makeChessPromotion(parameters[2]); maybe?
+        ChessMove move = new ChessMove(startPosition, endPosition, null);
+        webSocket.makeMove(clientSession, move);
         return "Success";
     }
 

@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.*;
 import chess.ChessGame.TeamColor;
 
@@ -12,10 +13,13 @@ public interface GameDao {
     GameData getGame(int gameId) throws DataAccessException;
     // List game
     GameListData getGameList() throws DataAccessException;
+    ChessGame.GameStatus getGameStatus (int gameID) throws DataAccessException;
     // Update game
     void insertUserIntoGame(GameData updateGameData) throws DataAccessException;
 
     void removeUser(int gameId, TeamColor teamColor) throws DataAccessException;
+
+    void updateGameBoard(ChessGame chessGame, int gameId) throws DataAccessException;
 
     void clearDb() throws DataAccessException;
 }
