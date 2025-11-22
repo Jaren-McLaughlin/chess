@@ -21,5 +21,7 @@ public interface GameDao {
 
     void updateGameBoard(ChessGame chessGame, int gameId) throws DataAccessException;
 
+    void updateGameStatus(int gameId, ChessGame.GameStatus gameStatus) throws DataAccessException;
+
     void clearDb() throws DataAccessException;
 }

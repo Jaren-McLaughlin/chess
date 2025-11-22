@@ -56,7 +56,7 @@ public class WebSocketFacade extends Endpoint {
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw HttpException.internalServerError("Something went wrong");
+            System.out.println("There was an error sending the message to the server, try again");
         }
     }
 
@@ -69,7 +69,7 @@ public class WebSocketFacade extends Endpoint {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException error) {
-            System.out.println("There was an error");
+            System.out.println("There was an error sending the message to the server, try again");
         }
     }
 
@@ -78,7 +78,7 @@ public class WebSocketFacade extends Endpoint {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException error) {
-            System.out.println("There was an error");
+            System.out.println("There was an error sending the message to the server, try again");
         }
     }
 
@@ -87,7 +87,7 @@ public class WebSocketFacade extends Endpoint {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException error) {
-            System.out.println("There was an error");
+            System.out.println("There was an error sending the message to the server, try again");
         }
     }
 
@@ -96,7 +96,7 @@ public class WebSocketFacade extends Endpoint {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException error) {
-            System.out.println("There was an error");
+            System.out.println("There was an error sending the message to the server, try again");
         }
     }
 
@@ -105,7 +105,7 @@ public class WebSocketFacade extends Endpoint {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException error) {
-            System.out.println("There was an error");
+            System.out.println("There was an error sending the message to the server, try again");
         }
     }
 
@@ -114,7 +114,7 @@ public class WebSocketFacade extends Endpoint {
         try {
             this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException error) {
-            System.out.println("There was an error");
+            System.out.println("There was an error sending the message to the server, try again");
         }
     }
 }

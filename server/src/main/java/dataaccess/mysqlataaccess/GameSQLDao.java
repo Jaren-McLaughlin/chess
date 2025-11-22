@@ -138,17 +138,6 @@ public class GameSQLDao implements GameDao {
         }
     }
 
-    public void updateGameStatus(int gameId, ChessGame.GameStatus gameStatus) throws DataAccessException {
-        String statement = "UPDATE game SET gameStatus = ? WHERE gameId = ?";
-        try (Connection con = DatabaseManager.getConnection()) {
-            PreparedStatement query = con.prepareStatement(statement);
-            query.setString(1, gameStatus.toString());
-            query.setInt(2, gameId);
-            query.executeUpdate();
-        } catch (DataAccessException | SQLException error) {
-            throw new DataAccessException("SQL Error: " + error);
-        }
-    }
 
     public void updateGameBoard(ChessGame chessGame, int gameId) throws DataAccessException {
         String jsonChessGame = new Gson().toJson(chessGame);
@@ -157,6 +146,19 @@ public class GameSQLDao implements GameDao {
         try (Connection con = DatabaseManager.getConnection()) {
             PreparedStatement query = con.prepareStatement(statement);
             query.setString(1, jsonChessGame);
+            query.setInt(2, gameId);
+            query.executeUpdate();
+        } catch (DataAccessException | SQLException error) {
+            throw new DataAccessException("SQL Error: " + error);
+        }
+    }
+
+
+    public void updateGameStatus(int gameId, ChessGame.GameStatus gameStatus) throws DataAccessException {
+        String statement = "UPDATE game SET gameStatus = ? WHERE gameId = ?";
+        try (Connection con = DatabaseManager.getConnection()) {
+            PreparedStatement query = con.prepareStatement(statement);
+            query.setString(1, gameStatus.toString());
             query.setInt(2, gameId);
             query.executeUpdate();
         } catch (DataAccessException | SQLException error) {

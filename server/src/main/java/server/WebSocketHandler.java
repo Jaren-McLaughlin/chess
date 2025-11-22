@@ -121,7 +121,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         return null;
     }
 
-    private NotificationMessage getGameState (int gameId, ChessGame.TeamColor opponentColor) {
+    private boolean gameOver (int gameId) {
+        ChessGame.GameStatus gameStatus = null;
+        try {
+            gameStatus = gameDao.getGameStatus(gameId);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        if (gameStatus != ChessGame.GameStatus.PLAYING) {
+            return false;
+        }
+        return true;
+    }
+
+    private NotificationMessage validateGameState (int gameId, ChessGame.TeamColor opponentColor) {
         GameData gameData;
         try {
             gameData = gameDao.getGame(gameId);
@@ -133,8 +146,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (chessGame.isInCheckmate(opponentColor)) {
             String message = opponentColor.toString() + " is in checkmate, game over";
             // Mark game as over
+            try {
+                gameDao.updateGameStatus(gameId, ChessGame.GameStatus.CHECKMATE);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
             return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         } else if (chessGame.isInStalemate(opponentColor)) {
+            try {
+                gameDao.updateGameStatus(gameId, ChessGame.GameStatus.STALEMATE);
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
             String message = "The match is in a stalemate, game over";
             return new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         } else if (chessGame.isInCheck(opponentColor)) {
@@ -230,15 +253,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throw new RuntimeException(e);
         }
 
-//        This is so wrong haha, it messes up because it broadcasts it...
         ChessGame.TeamColor drawFrom = getTeamColor(gameId, user);
         NotificationMessage gameBoardMessage = sendChessBoard(gameId, drawFrom, null);
+
+        ChessGame.TeamColor opponentColor;
+        if (ChessGame.TeamColor.BLACK == drawFrom) {
+            opponentColor = ChessGame.TeamColor.WHITE;
+        } else {
+            opponentColor = ChessGame.TeamColor.BLACK;
+        }
+
+        NotificationMessage gameStatusMessage = validateGameState(gameId, opponentColor);
         String message = "Movement happened";
         NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         try {
             connections.messageOthers(gameBoardMessage, session);
             connections.messageUser(gameBoardMessage, session);
             connections.messageOthers(notificationMessage, session);
+            if (gameStatusMessage != null) {
+                connections.messageOthers(gameStatusMessage, session);
+                connections.messageUser(gameStatusMessage, session);
+            }
         } catch (IOException error) {
             System.out.println("There was an error with this");
             error.printStackTrace();
@@ -246,7 +281,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void resign (UserGameCommandMessage userGameCommand, Session session) {
-
+        try {
+            gameDao.updateGameStatus(userGameCommand.getGameID(), ChessGame.GameStatus.RESIGNED);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        String message = "Resigned the game";
+        NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        try {
+            connections.messageOthers(notificationMessage, session);
+        } catch (IOException error) {
+            System.out.println("There was an error with this");
+            error.printStackTrace();
+        }
     }
 
     private void redrawBoard (UserGameCommandMessage userGameCommand, Session session) {

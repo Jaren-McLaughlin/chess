@@ -58,9 +58,23 @@ public class GameMemoryDao implements GameDao {
         }
         game.put(gameId, newGameData);
     }
+
     public void updateGameBoard (ChessGame chessGame, int gameId) {
-        gameStatuses.put(gameId, ChessGame.GameStatus.PLAYING);
+        GameData gameData = game.get(gameId);
+        GameData newGame = new GameData(
+                gameId,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                chessGame
+        );
+        game.put(gameId, newGame);
     }
+
+    public void updateGameStatus (int gameId,ChessGame.GameStatus gameStatus) {
+        gameStatuses.put(gameId, gameStatus);
+    }
+
     public void clearDb() {
         game.clear();
         numberOfGames = 1;

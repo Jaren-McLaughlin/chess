@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -70,10 +71,22 @@ public class GamePlay implements CommandHandler, NotificationHandler {
     }
 
     private String makeMove (ClientSession clientSession, String[] parameters) {
+        if (parameters.length < 2) {
+            System.out.println("Invalid options for observing a game, please follow this format: makeMove <Col><Row> <Col><Row>");
+            return null;
+        }
         ChessPosition startPosition = makeChessPosition(parameters[0]);
         ChessPosition endPosition = makeChessPosition(parameters[1]);
-//        ChessPiece endPosition = makeChessPromotion(parameters[2]); maybe?
-        ChessMove move = new ChessMove(startPosition, endPosition, null);
+        ChessPiece.PieceType pawnPromotion = null;
+        if (parameters.length == 3) {
+            try {
+                pawnPromotion = ChessPiece.PieceType.valueOf(parameters[2].toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid pawn promotion, possible promotions: ");
+                return null;
+            }
+        }
+        ChessMove move = new ChessMove(startPosition, endPosition, pawnPromotion);
         webSocket.makeMove(clientSession, move);
         return "Success";
     }
@@ -89,6 +102,10 @@ public class GamePlay implements CommandHandler, NotificationHandler {
     }
 
     private String showMoves(ClientSession clientSession, String[] parameters) {
+        if (parameters.length < 1) {
+            System.out.println("Invalid options for observing a game, please follow this format: showmoves <Col><Row>");
+            return null;
+        }
         ChessPosition chessPosition = makeChessPosition(parameters[0]);
         webSocket.showMoves(clientSession, chessPosition);
         return "Success";
@@ -100,10 +117,15 @@ public class GamePlay implements CommandHandler, NotificationHandler {
     }
 
     private ChessPosition makeChessPosition(String rowColCombo) {
-        char charCol = rowColCombo.charAt(0);
-        char charRow = rowColCombo.charAt(1);
-        int intCol = charCol  - 'a' + 1;
-        int intRow = charRow - '0';
-        return new ChessPosition(intRow, intCol);
+        try {
+            char charCol = rowColCombo.charAt(0);
+            char charRow = rowColCombo.charAt(1);
+            int intCol = charCol - 'a' + 1;
+            int intRow = charRow - '0';
+            return new ChessPosition(intRow, intCol);
+        } catch (Exception error) {
+            System.out.println("There was an error with the move, make sure each moveset is <Col><Row> for example d4");
+        }
+        return null;
     }
 }
